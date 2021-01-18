@@ -32,33 +32,34 @@ class Game():
     def setPhasa(self, phasa):
         self.phasa = phasa
         if self.phasa == P_MENUSTART:
-            self.main = self.startMenu
+            self.scene = self.startMenu
 
 
     def initGame(self):
-        self.setPhasa(P_MENUSTART)
-        self.main = None
+        self.scene = None
+        self.fps = 30
         self.startMenu = StartMenu(self.size, lambda: print("START"))
 
-        # group = pygame.sprite.LayeredUpdates((but))
+
+        self.setPhasa(P_MENUSTART)
 
     def mainLoop(self):
-        self.fps = 30
         self.clock = pygame.time.Clock()
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                self.scene.update(event)
 
-                startMenu.update(event)
 
             screen.fill((0, 0, 0))
-            startMenu.draw(screen)
-            clock.tick(fps)
+            self.scene.draw(screen)
+            self.clock.tick(self.fps)
             pygame.display.flip()
         pygame.quit()
 
 
 if __name__ == '__main__':
     game = Game(SIZE)
+    game.main()
