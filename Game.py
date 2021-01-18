@@ -43,6 +43,7 @@ class Game():
 
         self.setPhasa(P_MENUSTART)
 
+
     def mainLoop(self):
         self.clock = pygame.time.Clock()
         running = True
