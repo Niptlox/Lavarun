@@ -1,0 +1,45 @@
+import pygame
+
+
+SIZE = (700, 400)
+class Window:
+    RECT = pygame.Rect(((0, 0), SIZE))
+
+    def __init__(self, size):
+        self.size = size
+        self.screen = None
+        self.phasa = None
+        self.scene = None
+        self.fps = 30
+        self.initPG()
+        self.initGame()
+
+    def main(self):
+        self.mainLoop()
+
+    def initPG(self):
+        self.screen = pygame.display.set_mode(self.size)
+
+    def setPhasa(self, phasa):
+        self.phasa = phasa
+        if self.phasa is None:
+            self.scene = None
+
+    def initGame(self):
+        self.setPhasa(None)
+
+    def mainLoop(self):
+        self.clock = pygame.time.Clock()
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                self.scene.update(event)
+
+            # screen.fill((0, 0, 0))
+            self.scene.draw(self.screen)
+            self.clock.tick(self.fps)
+            pygame.display.flip()
+        pygame.quit()
+

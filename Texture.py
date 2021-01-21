@@ -1,6 +1,7 @@
 import pygame
 import os
 import sys
+from pygame import Color
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
@@ -9,14 +10,30 @@ WHITE = (255, 255, 255)
 
 COLORKEY = GREEN
 
+def isColor(arg):
+    if type(arg) is pygame.Color or (type(arg) in (tuple, list) and 3 <= len(arg) <= 4):
+        return True
+    return False
 
 def get_texture(texture, colorkey=None):
     if texture is None:
         return None
-    if type(texture) == str:
+    if type(texture) is str:
         return load_image(texture, colorkey)
+    # if type(texture) is pygame.Color:
+    #     return
     return texture
 
+def get_texture_size(texture, size=None, colorkey=None):
+    if texture is None:
+        return None
+    if type(texture) is str:
+        return load_image(texture, colorkey)
+    if isColor(texture) and size is not None:
+        surf = pygame.Surface(size)
+        surf.fill(texture)
+        texture = surf
+    return texture
 
 def load_image(name, colorkey=None):
     fullname = name #os.path.join('data', name)
