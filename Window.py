@@ -39,7 +39,7 @@ class Window:
 
             # screen.fill((0, 0, 0))
             self.scene.draw(self.screen)
-            self.clock.tick(self.fps)
             pygame.display.flip()
+            self.clock.tick(self.fps)
         pygame.quit()
 

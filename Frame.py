@@ -19,17 +19,21 @@ class Frame(pygame.sprite.Sprite):
         if bg is not None:
             if isColor(bg):
                 self.bg = get_texture_size(bg, size=self.rect.size)
+                self.color = bg
             else:
                 self.bg = get_texture(bg, colorkey=COLORKEY)
-                self.bg = pygame.transform.scale(self.bg, self.rect.size)
+                if not (self.rect.width == 0 and self.rect.height == 0):
+                    self.bg = pygame.transform.scale(self.bg, self.rect.size)
+                else:
+                    self.rect.size = self.bg.rect.size[:]
         else:
             self.bg = pygame.Surface(self.rect.size)
 
         self.groupObjs = pygame.sprite.LayeredUpdates()
-        self.frames = []
+        # self.frames = []
         self.image = pygame.Surface(self.rect.size)
         self.screenRect = self.rect
-        self.offsetXY = (0, 0)
+        self.offsetXY = [0, 0]
 
     def setXY(self, xy):
         x, y = xy
@@ -43,6 +47,7 @@ class Frame(pygame.sprite.Sprite):
         self.offsetXY = offsetXY
 
     def update(self, *args):
+        print("update", self.__class__, args)
         if args:
             event = args[0]
             if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION, pygame.MOUSEWHEEL):
@@ -54,23 +59,39 @@ class Frame(pygame.sprite.Sprite):
             else:
                 self.groupObjs.update(event)
 
-    def draw(self, screen):
+    def redraw(self):
         self.image.blit(self.bg, (0, 0))
-        self.groupObjs.draw(screen)
-        self.drawFrames(screen)
+        # self.groupObjs.draw(self.image)
+        self.drawFrames()
+        # self.drawFrames(self.image)
 
-    def drawFrames(self, screen):
-        rectArea = pygame.Rect((self.rect.size, self.offsetXY))
-        print(rectArea, self.frames[0].rect)
-        for item in rectArea.collidelistall(tuple(map(lambda it: it.rect, self.frames))):
+    def draw(self, screen):
+        self.redraw()
+        screen.blit(self.image, self.rect)
+        print(screen, (self.image, self.rect))
+
+    def drawFrames(self):
+        print("drawFrames start")
+        frames = self.groupObjs
+        rectArea = pygame.Rect((self.offsetXY, self.rect.size))
+        rectFrames = tuple(map(lambda it: it.rect, frames))
+        print(rectArea, rectFrames)
+        for itemNum in rectArea.collidelistall(rectFrames):
+            # item = frames[itemNum]
+            item = frames.get_sprite(itemNum)
             pos = item.rect.x - self.offsetXY[0], item.rect.y - self.offsetXY[1]
-            print(pos)
-            self.image.blit(item, pos)
+            item.redraw()
+            self.image.blit(item.image, pos)
+            # pygame.image.save(item.image, f"data/exp/sp1{itemNum}.png")
+            # print("drawItem", pos, item.rect, item, item.image, item.color)
+            # input(" pygame.image.save(self")
 
-        screen.blit(self.image, self.rect, area=self.rect)
+        # screen.blit(self.image, self.rect, area=self.rect)
+        print("drawFrames stop")
 
     def add_frame(self, item):
-        self.frames.append(item)
+        self.groupObjs.add(item)
+        # self.frames.append(item)
 
 
 

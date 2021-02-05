@@ -31,7 +31,7 @@ def get_texture_size(texture, size=None, colorkey=None):
         return load_image(texture, colorkey)
     if isColor(texture) and size is not None:
         surf = pygame.Surface(size)
-        surf.fill(texture)
+        surf.fill(tuple(map(lambda x: min(x, 255), texture)))
         texture = surf
     return texture
 
