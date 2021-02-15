@@ -1,8 +1,5 @@
-import pygame
-from Texture import *
-from Button import *
-from Window import *
-from ui import *
+from UI.Window import *
+from UI.ui import *
 
 pygame.init()
 

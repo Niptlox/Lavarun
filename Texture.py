@@ -10,10 +10,12 @@ WHITE = (255, 255, 255)
 
 COLORKEY = GREEN
 
+
 def isColor(arg):
     if type(arg) is pygame.Color or (type(arg) in (tuple, list) and 3 <= len(arg) <= 4):
         return True
     return False
+
 
 def get_texture(texture, colorkey=None):
     if texture is None:
@@ -24,19 +26,24 @@ def get_texture(texture, colorkey=None):
     #     return
     return texture
 
+
 def get_texture_size(texture, size=None, colorkey=None):
     if texture is None:
         return None
     if type(texture) is str:
-        return load_image(texture, colorkey)
+        image = load_image(texture, colorkey)
+        if size is not None:
+            image = pygame.transform.scale(image, size)
+        return image
     if isColor(texture) and size is not None:
         surf = pygame.Surface(size)
         surf.fill(tuple(map(lambda x: min(x, 255), texture)))
         texture = surf
     return texture
 
+
 def load_image(name, colorkey=None):
-    fullname = name #os.path.join('data', name)
+    fullname = name  # os.path.join('data', name)
     # если файл не существует, то выходим
     # fullname = r"BetaIMG.png"
     if not os.path.isfile(fullname):
@@ -53,3 +60,18 @@ def load_image(name, colorkey=None):
     # else:
     #     image = image.convert_alpha()
     return image
+
+
+def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):
+    animation_name = path.split('/')[-1]
+    animation_frames = []
+    n = 0
+    for count_frame in frame_durations:
+        animation_frame_id = animation_name + '_' + str(n)
+        img_loc = path + '/' + animation_frame_id + '.png'
+        # player_animations/idle/idle_0.png
+        animation_image = get_texture_size(img_loc, colorkey=colorkey, size=size)
+        for i in range(count_frame):
+            animation_frames.append(animation_image)
+        n += 1
+    return animation_frames

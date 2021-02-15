@@ -1,5 +1,4 @@
-from Window import *
-from Frame import *
+from UI.Frame import *
 
 HORIZONTAL = 1
 VERTICAL = 2
@@ -29,19 +28,30 @@ class ScrollArea(Frame):
         self.vspace, self.hspace = vspace, hspace
         self.lockScrollBorderItem = lockScrollBorderItem
         self.addItem(*items)
+        self.sizeAllFrames = [0, 0]
 
     def addOffset(self, ax=0, ay=0):
-        oox, ooy = self.offsetXY
         self.offsetXY[0] += ax
         self.offsetXY[1] += ay
-        if self.lockScrollBorderItem and not self.groupObjs.empty():
-            firstItemR = self.groupObjs.get_sprite(0).rect
-            lastItemR = self.groupObjs.get_sprite(0).rect
+
+        ss = -1
+        if self.lockScrollBorderItem and len(self.groupObjs) > 0:
+
             if self.orientation == HORIZONTAL:
-                if self.offsetXY[0] > 0:
+                if self.offsetXY[0] < 0:
                     self.offsetXY[0] = 0
-                if lastItemR.x < ax + self.hspace:
-                    self.offsetXY[0] = 0
+                ss = self.sizeAllFrames[0] - self.rect.w + self.hspace
+                # print("offsetXY", self.offsetXY, ss, self.rect.w, self.sizeAllFrames[0])
+                if self.rect.w < self.sizeAllFrames[0] and self.offsetXY[0] > ss:
+                    self.offsetXY[0] = ss
+            if self.orientation == VERTICAL:
+                if self.offsetXY[1] < 0:# or self.rect.h > self.sizeAllFrames[1]:
+                    self.offsetXY[1] = 0
+                ss = self.sizeAllFrames[1] - self.rect.h + self.vspace
+                print("offsetXY", self.offsetXY, ss, self.rect.h, self.sizeAllFrames[1])
+                if self.rect.h < self.sizeAllFrames[1] and self.offsetXY[1] > ss:
+                    self.offsetXY[1] = ss
+
 
 
     def shift(self, direction=FORWARD):
@@ -61,6 +71,8 @@ class ScrollArea(Frame):
                       lastItem.rect.y + lastItem.rect.height + self.spaceItems)
         else:
             xy = (self.hspace, self.vspace)
+        self.sizeAllFrames[0] = xy[0] + item.rect.w
+        self.sizeAllFrames[1] = xy[1] + item.rect.h
         item.rect.move_ip(*xy)
         self.add_frame(item)
 

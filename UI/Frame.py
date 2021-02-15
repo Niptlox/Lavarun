@@ -35,6 +35,7 @@ class Frame(pygame.sprite.Sprite):
         self.screenRect = self.rect
         self.offsetXY = [0, 0]
 
+
     def setXY(self, xy):
         x, y = xy
         ax, ay = x - self.rect.x, y - self.rect.y
@@ -47,7 +48,7 @@ class Frame(pygame.sprite.Sprite):
         self.offsetXY = offsetXY
 
     def update(self, *args):
-        print("update", self.__class__, args)
+        # print("update", self.__class__, args)
         if args:
             event = args[0]
             if event.type in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION, pygame.MOUSEWHEEL):
@@ -68,14 +69,14 @@ class Frame(pygame.sprite.Sprite):
     def draw(self, screen):
         self.redraw()
         screen.blit(self.image, self.rect)
-        print(screen, (self.image, self.rect))
+        # print(screen, (self.image, self.rect))
 
     def drawFrames(self):
-        print("drawFrames start")
+        # print("drawFrames start")
         frames = self.groupObjs
         rectArea = pygame.Rect((self.offsetXY, self.rect.size))
         rectFrames = tuple(map(lambda it: it.rect, frames))
-        print(rectArea, rectFrames)
+        # print(rectArea, rectFrames)
         for itemNum in rectArea.collidelistall(rectFrames):
             # item = frames[itemNum]
             item = frames.get_sprite(itemNum)
@@ -87,7 +88,7 @@ class Frame(pygame.sprite.Sprite):
             # input(" pygame.image.save(self")
 
         # screen.blit(self.image, self.rect, area=self.rect)
-        print("drawFrames stop")
+        # print("drawFrames stop")
 
     def add_frame(self, item):
         self.groupObjs.add(item)

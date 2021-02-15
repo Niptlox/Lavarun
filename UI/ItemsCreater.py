@@ -1,9 +1,6 @@
-import pygame
-from Texture import *
-from Button import *
-from Window import *
-from Frame import *
-from ScrollArea import *
+from UI.Button import *
+from UI.Window import *
+from UI.ScrollArea import *
 
 pygame.init()
 
@@ -18,13 +15,21 @@ class ItemsCreater(Frame):
     def initUI(self):
         w_item, h_item = 60, 30
         space_items = 5;
-        self.scrollArea = ScrollArea((10, 10, 300, h_item + 10), orientation=VERTICAL, bg=WHITE, step=h_item + space_items,
-                                     spaceItems=space_items,
+        self.scrollArea = ScrollArea((10, 10, 300, 400), orientation=VERTICAL, bg=WHITE, step=2 *(h_item + space_items - 5),
+                                     spaceItems=space_items
                                      )
-
-        for i in range(10):
+        n = 10
+        for i in range(n):
             frame = Frame(((0, 0), (w_item, h_item)), bg=(15 * i, 20 * i + 3, 100))
             self.scrollArea.addItem(frame)
+
+        n = 3
+        for i in range(n):
+            # frame = Frame(((0, 0), (w_item, h_item)), bg=(15 * i, 20 * i + 3, 100))
+            # frame = Button(((0, 0), (w_item, h_item)), bg=(15 * i, 20 * i + 3, 100))
+            imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
+            butStart = Button((0, 0), imgB_up, imgB_in, imgB_down, lambda ii=i: print(f"START {ii}"), size=(170, 40))
+            self.scrollArea.addItem(butStart)
 
         # self.add_frame(scrollArea)
 
@@ -36,10 +41,11 @@ class ItemsCreater(Frame):
         if args:
             event = args[0]
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:
-                    self.scrollArea.shift(FORWARD)
                 if event.button == 5:
+                    self.scrollArea.shift(FORWARD)
+                if event.button == 4:
                     self.scrollArea.shift(BACK)
+            self.scrollArea.update(event)
 
 
 class ItemsCreaterMain(Window):
@@ -58,5 +64,5 @@ class ItemsCreaterMain(Window):
 
 
 if __name__ == '__main__':
-    itMainCreater = ItemsCreaterMain(SIZE)
+    itMainCreater = ItemsCreaterMain((700, 600))
     itMainCreater.main()

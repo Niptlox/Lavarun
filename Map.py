@@ -1,6 +1,4 @@
-import pygame
-from Texture import *
-from Button import *
+from UI.Button import *
 
 
 
