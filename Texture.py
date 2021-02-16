@@ -2,11 +2,13 @@ import pygame
 import os
 import sys
 from pygame import Color
+pygame.init()
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
+BLACK = (0,0,0)
 
 COLORKEY = GREEN
 
@@ -63,12 +65,13 @@ def load_image(name, colorkey=None):
 
 
 def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):
-    animation_name = path.split('/')[-1]
+    animation_name = path.split('/')[-1].split('\\')[-1]
     animation_frames = []
     n = 0
+    print("load_animation", path, animation_name)
     for count_frame in frame_durations:
         animation_frame_id = animation_name + '_' + str(n)
-        img_loc = path + '/' + animation_frame_id + '.png'
+        img_loc = path + '_' + str(n) + '.png'
         # player_animations/idle/idle_0.png
         animation_image = get_texture_size(img_loc, colorkey=colorkey, size=size)
         for i in range(count_frame):

@@ -8,25 +8,26 @@ TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 CHUNK_SIZE = 16
 
 N_DIRT = 1
-path_tile = r"data\sprites\tiles\ "
+path_tile = r"data\sprites\tiles\\"
 tiles_frames = {
     N_DIRT: get_texture_size(path_tile + "dirt.png", size=TILE_SIZEL)
 }
 
-PLAYER_RECT = pygame.Rect(((0,0),(TILE_SIZE, TILE_SIZE * 2)))
-path_player = r"data\sprites\player\ "
+PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE, TILE_SIZE * 2)))
+path_player = r"data\sprites\player\\"
 player_frames = {
     "idle": load_animation(path_player + r"idle\idle", [10, 5], size=PLAYER_RECT.size),
-    "run": load_animation(path_player + r"idle\run", [5, 5, 5], size=PLAYER_RECT.size)
+    "run": load_animation(path_player + r"run\run", [5, 5, 5], size=PLAYER_RECT.size)
 }
 
 
-def collision_test(rect,tiles):
+def collision_test(rect, tiles):
     hit_list = []
     for tile in tiles:
         if rect.colliderect(tile):
             hit_list.append(tile)
     return hit_list
+
 
 class EntityStatic(pygame.sprite.Sprite):
     def __init__(self, rect: pygame.Rect, animation: dict, animation_action="idle"):
@@ -35,6 +36,8 @@ class EntityStatic(pygame.sprite.Sprite):
         self.animation_action = animation_action
         self.start_animation_action = animation_action
         self.num_frame = 0
+        self.image = None
+        self.set_animation_action(animation_action)
 
     def draw(self, screen, xy=None):
         """Если xy is None, то используется записане в спрайт координаты иначе xy"""
@@ -45,6 +48,11 @@ class EntityStatic(pygame.sprite.Sprite):
     def new_tick(self, timeTick=None):
         self.image = self.animation[self.animation_action][self.num_frame]
         self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
+
+    def set_animation_action(self, animation_action):
+        self.animation_action = animation_action
+        self.num_frame = 0
+        self.image = self.animation[self.animation_action][self.num_frame]
 
     def get_display_xy(self, scroll):
         return self.rect.x - scroll[0], self.rect.y - scroll[1]
@@ -70,7 +78,7 @@ class Entity(EntityStatic):
 
 class Player(Entity):
     def __init__(self, xy):
-        rect = PLAYER_RECT.move(*xy) # is copy rect
+        rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
 
     def new_game(self):
@@ -121,7 +129,7 @@ class Player(Entity):
             self.player_flip = True
 
         ox, oy = self.rect.x, self.rect.y
-        self.rect, collisions = self.move(self.rect, player_movement)
+        self.rect, collisions = self.move(self.rect, player_movement, tile_rects)
         true_movement = [self.rect.x - ox, self.rect.y - oy]
         if collisions['bottom'] == True:
             self.air_timer = 0
@@ -153,7 +161,8 @@ class Player(Entity):
             elif movement[1] < 0:
                 rect.top = tile.bottom
                 collision_types['top'] = True
-        return rect, collision_types, ()
+        return rect, collision_types
+
 
 class World:
     def __init__(self, level=-1, game_map={}, display_size=(720, 480)):
@@ -176,7 +185,7 @@ class World:
     def get_chunk(self, xy):
         if xy not in self.game_map:
             if self.level < 0:
-                self.game_map[xy] = self.generation_chunk(self, xy, level=self.level)
+                self.game_map[xy] = self.generation_chunk(xy, self.level)
             else:
                 return
         return self.game_map[xy]
@@ -192,10 +201,11 @@ class World:
                 target_y = y * CHUNK_SIZE + y_pos
                 tile_type = 0  # nothing
                 if target_y > 10:
-                    tile_type = 2  # dirt
+                    tile_type = N_DIRT  # dirt
                 if tile_type != 0:
                     chunk_data.append([[target_x, target_y], tile_type])
                 i += 1
+        print(chunk_data)
         return chunk_data
 
     def new_game(self, game_map=None, level=None):
@@ -203,12 +213,12 @@ class World:
         self.level = level if level is not None else self.level
         self.scroll = [0, 0]
         self.player = Player((self.display_size[0] // 2, self.display_size[1] // 2))
-
+        self.player.new_game()
 
     def update(self):
         # Скользящие перемещение камеры
-        self.scroll[0] += (self.Player.rect.x - self.scroll[0] - self.display_size[0] // 2) / 20
-        self.scroll[1] += (self.Player.rect.y - self.scroll[1] - self.display_size[1] // 2) / 20
+        self.scroll[0] += (self.player.rect.x - self.scroll[0] - self.display_size[0] // 2) / 20
+        self.scroll[1] += (self.player.rect.y - self.scroll[1] - self.display_size[1] // 2) / 20
 
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
         # Обновление, нахождение, всех спрайтов на экране
@@ -218,13 +228,14 @@ class World:
 
     def redraw(self, surface):
         self.display.fill((246, 144, 255))
+        print("get_chank", self.tiles)
         for tile in self.tiles:
-            xy_tile = (tile[0][0] * TILE_SIZE, tile[0][1] * TILE_SIZE)
+            xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE- self.scroll[1])
             type_tile = tile[1]
             self.display.blit(tiles_frames[type_tile], xy_tile)
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
-        self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.y - scroll[1]))
-        surface.blit( pygame.transform.scale(self.display, surface.rect.size))
+        self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.rect.y - scroll[1]))
+        surface.blit(pygame.transform.scale(self.display, surface.get_size()), (0, 0))
 
     def get_event(self, event):
         self.player.update(event)
@@ -258,19 +269,23 @@ class World:
                         # может твердые а может и нет, обекты для взаимного действия, допустим человечки
                         rect = pygame.Rect(tile_xy[0] * TILE_SIZE, tile_xy[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                         entitys.append((rect, tile[1]))
-        return  tile_rects, tiles, entitys
+        return tile_rects, tiles, entitys
 
 
 class GameFrame(Frame):
     def __init__(self, rect, world):
-        super().__init__(rect, bg=world.background)
+        super().__init__(rect, bg=BLACK)
         self.world = world
 
     def update(self, args):
-        if args:
-            self.world.get_event(args)
-        else:
-            self.world.update()
+
+        self.world.get_event(args)
+
+
 
     def redraw(self):
+        self.world.update()
         self.world.redraw(self.image)
+
+    def newGame(self, level):
+        self.world.new_game(level=level)

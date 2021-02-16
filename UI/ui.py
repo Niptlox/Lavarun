@@ -11,7 +11,7 @@ class StartMenu(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.rect.size)
         self.background = StartMenu.background
         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
-        self.butStart = Button((100, 120),  imgB_up, imgB_in, imgB_down, lambda: print("START"), size=(170, 40))
+        self.butStart = Button((100, 120),  imgB_up, imgB_in, imgB_down, funcStart, size=(170, 40))
         self.butStart2 = Button((100, 190), imgB_up, imgB_in, imgB_down, lambda: print("START2"), size=(170, 40))
         self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2))
 
