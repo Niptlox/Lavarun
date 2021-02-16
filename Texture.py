@@ -70,7 +70,7 @@ def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):
     n = 0
     print("load_animation", path, animation_name)
     for count_frame in frame_durations:
-        animation_frame_id = animation_name + '_' + str(n)
+        # animation_frame_id = animation_name + '_' + str(n)
         img_loc = path + '_' + str(n) + '.png'
         # player_animations/idle/idle_0.png
         animation_image = get_texture_size(img_loc, colorkey=colorkey, size=size)

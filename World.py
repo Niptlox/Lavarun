@@ -2,8 +2,9 @@ import pygame
 import Texture
 from UI.Frame import *
 from math import ceil  # округление в большую сторону
+from random import randint
 
-TILE_SIZE = 32
+TILE_SIZE = 40
 TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 CHUNK_SIZE = 16
 
@@ -13,11 +14,13 @@ tiles_frames = {
     N_DIRT: get_texture_size(path_tile + "dirt.png", size=TILE_SIZEL)
 }
 
-PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE, TILE_SIZE * 2)))
+PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE * 0.95, TILE_SIZE * 2 * 0.95)))
 path_player = r"data\sprites\player\\"
+colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 player_frames = {
-    "idle": load_animation(path_player + r"idle\idle", [10, 5], size=PLAYER_RECT.size),
-    "run": load_animation(path_player + r"run\run", [5, 5, 5], size=PLAYER_RECT.size)
+
+    "run": load_animation(path_player + r"run\run", [4, 3, 4], size=PLAYER_RECT.size),
+"idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI)
 }
 
 
@@ -33,11 +36,11 @@ class EntityStatic(pygame.sprite.Sprite):
     def __init__(self, rect: pygame.Rect, animation: dict, animation_action="idle"):
         self.rect = rect
         self.animation = animation
-        self.animation_action = animation_action
+        self.animation_action = None
         self.start_animation_action = animation_action
         self.num_frame = 0
         self.image = None
-        self.set_animation_action(animation_action)
+        self.change_action(animation_action)
 
     def draw(self, screen, xy=None):
         """Если xy is None, то используется записане в спрайт координаты иначе xy"""
@@ -48,18 +51,16 @@ class EntityStatic(pygame.sprite.Sprite):
     def new_tick(self, timeTick=None):
         self.image = self.animation[self.animation_action][self.num_frame]
         self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
-
-    def set_animation_action(self, animation_action):
-        self.animation_action = animation_action
-        self.num_frame = 0
-        self.image = self.animation[self.animation_action][self.num_frame]
+        print("num_frame", self.num_frame)
 
     def get_display_xy(self, scroll):
         return self.rect.x - scroll[0], self.rect.y - scroll[1]
 
     def change_action(self, animation_action):
-        self.animation_action = animation_action
-        self.num_frame = 0
+        if animation_action != self.animation_action:
+            self.animation_action = animation_action
+            self.num_frame = 0
+            self.image = self.animation[self.animation_action][self.num_frame]
 
     def new_game(self):
         self.change_action(self.start_animation_action)
@@ -76,10 +77,14 @@ class Entity(EntityStatic):
         super().__init__(rect, animation, animation_action)
 
 
+
 class Player(Entity):
     def __init__(self, xy):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
+        self.jump_speed = 9 / 32 * TILE_SIZE  # скорость при старте прыжка
+        self.speed = 4 / 32 * TILE_SIZE  # скорость ходения
+        self.gravity = 0.4 / 32 * TILE_SIZE  # скорость падения
 
     def new_game(self):
         super().new_game()
@@ -99,7 +104,7 @@ class Player(Entity):
                     self.moving_left = True
                 if event.key == pygame.K_UP:
                     if self.air_timer < 6:
-                        self.vertical_momentum = -5
+                        self.vertical_momentum = -self.jump_speed
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.moving_right = False
@@ -111,13 +116,14 @@ class Player(Entity):
     def new_tick(self, timeTick=None, tile_rects=[]):
         player_movement = [0, 0]
         if self.moving_right == True:
-            player_movement[0] += 2
+            player_movement[0] += self.speed
         if self.moving_left == True:
-            player_movement[0] -= 2
+            player_movement[0] -= self.speed
         player_movement[1] += self.vertical_momentum
-        self.vertical_momentum += 0.2
-        if self.vertical_momentum > 3:
-            self.vertical_momentum = 3
+        self.vertical_momentum += self.gravity
+        max_gravity = self.gravity * 15
+        if self.vertical_momentum > max_gravity:
+            self.vertical_momentum = max_gravity
 
         if player_movement[0] == 0:
             self.change_action('idle')
@@ -136,10 +142,18 @@ class Player(Entity):
             self.vertical_momentum = 0
         else:
             self.air_timer += 1
+        if collisions["top"] == True:
+            self.vertical_momentum = 0
 
-        print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
-        super().new_tick()
+        # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
+        self.update_image()
         return true_movement
+
+    def update_image(self):
+        player_img = self.animation[self.animation_action][self.num_frame]
+        self.image = pygame.transform.flip(player_img, self.player_flip, False)
+        self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
+        print("num_frame", self.num_frame)
 
     def move(self, rect, movement, tiles):
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
@@ -166,6 +180,7 @@ class Player(Entity):
 
 
 class World:
+    COF_CAMERA_FRICTION = 0.15
     def __init__(self, level=-1, game_map={}, display_size=(720, 480)):
         self.game_map = game_map
         self.level = level
@@ -184,7 +199,6 @@ class World:
         self.player = None
 
     def get_chunk(self, xy):
-        print(xy, xy not in self.game_map, self.level)
         if xy not in self.game_map:
             if self.level < 0:
                 self.game_map[xy] = self.generation_chunk(xy, self.level)
@@ -202,12 +216,13 @@ class World:
                 target_x = x * CHUNK_SIZE + x_pos
                 target_y = y * CHUNK_SIZE + y_pos
                 tile_type = 0  # nothing
+                if target_y == 6 and randint(0, 3) == 1:
+                    tile_type = N_DIRT
                 if target_y > 8:
                     tile_type = N_DIRT  # dirt
                 if tile_type != 0:
                     chunk_data.append([[target_x, target_y], tile_type])
                 i += 1
-        print("generation_chunk", chunk_data)
         return chunk_data
 
     def new_game(self, game_map=None, level=None):
@@ -219,8 +234,12 @@ class World:
 
     def update(self):
         # Скользящие перемещение камеры
-        self.scroll[0] += (self.player.rect.x - self.scroll[0] - self.display_size[0] // 2) / 20
-        self.scroll[1] += (self.player.rect.y - self.scroll[1] - self.display_size[1] // 2) / 20
+        offset = (self.display_size[0] // 2 - self.player.rect.w // 2,
+                  self.display_size[1] // 2 - self.player.rect.h // 2)
+        self.scroll[0] += (self.player.rect.x - self.scroll[0] - offset[0]) \
+                          * self.COF_CAMERA_FRICTION
+        self.scroll[1] += (self.player.rect.y - self.scroll[1] - offset[1]) \
+                          * (self.COF_CAMERA_FRICTION * 2)
 
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
         # Обновление, нахождение, всех спрайтов на экране
@@ -230,9 +249,8 @@ class World:
 
     def redraw(self, surface):
         self.display.fill((146, 144, 255))
-        print("get_chank", self.tiles)
         for tile in self.tiles:
-            xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE- self.scroll[1])
+            xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE - self.scroll[1])
             type_tile = tile[1]
             self.display.blit(tiles_frames[type_tile], xy_tile)
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
@@ -280,10 +298,7 @@ class GameFrame(Frame):
         self.world = world
 
     def update(self, args):
-
         self.world.get_event(args)
-
-
 
     def redraw(self):
         self.world.update()
