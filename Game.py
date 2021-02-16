@@ -33,7 +33,7 @@ class Game(Window):
         world = World.World(display_size=self.size)
         self.frameGame = World.GameFrame(((0, 0), self.size), world)
         self.setPhasa(P_MENUSTART)
-        self.setPhasa(P_GAMELOOP)
+        # self.setPhasa(P_GAMELOOP)
 
 
 if __name__ == '__main__':

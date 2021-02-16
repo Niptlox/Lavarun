@@ -137,6 +137,7 @@ class Player(Entity):
         else:
             self.air_timer += 1
 
+        print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         super().new_tick()
         return true_movement
 
@@ -172,7 +173,7 @@ class World:
         self.display = pygame.Surface(display_size)
 
         ss = CHUNK_SIZE * TILE_SIZE
-        self.display_chanks_size = (ceil((display_size[0]) / ss + 1), ceil((display_size[1]) / ss + 1))
+        self.display_chanks_size = (ceil((display_size[0]) / ss + 2), ceil((display_size[1]) / ss + 2))
 
         self.scroll = [0, 0]
 
@@ -183,6 +184,7 @@ class World:
         self.player = None
 
     def get_chunk(self, xy):
+        print(xy, xy not in self.game_map, self.level)
         if xy not in self.game_map:
             if self.level < 0:
                 self.game_map[xy] = self.generation_chunk(xy, self.level)
@@ -200,12 +202,12 @@ class World:
                 target_x = x * CHUNK_SIZE + x_pos
                 target_y = y * CHUNK_SIZE + y_pos
                 tile_type = 0  # nothing
-                if target_y > 10:
+                if target_y > 8:
                     tile_type = N_DIRT  # dirt
                 if tile_type != 0:
                     chunk_data.append([[target_x, target_y], tile_type])
                 i += 1
-        print(chunk_data)
+        print("generation_chunk", chunk_data)
         return chunk_data
 
     def new_game(self, game_map=None, level=None):
@@ -227,7 +229,7 @@ class World:
         self.player.update(tile_rects=self.tile_rects)
 
     def redraw(self, surface):
-        self.display.fill((246, 144, 255))
+        self.display.fill((146, 144, 255))
         print("get_chank", self.tiles)
         for tile in self.tiles:
             xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE- self.scroll[1])
@@ -244,20 +246,20 @@ class World:
         self.tile_rects = tile_rects = []  # для отображения физики
         self.tiles = tiles = []  # для отображения на экран
         self.entitys = entitys = []  # для взаимодействий
-        display_rect_for_tiles = (scroll[0] // TILE_SIZE, scroll[1] // TILE_SIZE), (
-            (display_size[0] + scroll[0] - 1) // TILE_SIZE, (display_size[1] + scroll[1] - 1) // TILE_SIZE)
+        # display_rect_for_tiles = (scroll[0] // TILE_SIZE, scroll[1] // TILE_SIZE), (
+        #     (display_size[0] + scroll[0] - 1) // TILE_SIZE, (display_size[1] + scroll[1] - 1) // TILE_SIZE)
         for y in range(self.display_chanks_size[1]):
             for x in range(self.display_chanks_size[0]):
-                target_x = x - 1 + int(round(scroll[0] / (CHUNK_SIZE * TILE_SIZE)))
-                target_y = y - 1 + int(round(scroll[1] / (CHUNK_SIZE * TILE_SIZE)))
+                target_x = x + int(round(scroll[0] / (CHUNK_SIZE * TILE_SIZE))) - 1
+                target_y = y + int(round(scroll[1] / (CHUNK_SIZE * TILE_SIZE))) - 1
                 target_chunk = (target_x, target_y)
                 chank = self.get_chunk(target_chunk)
                 for tile in chank:
                     tile_xy = tile[0]
-                    if not (display_rect_for_tiles[0][0] <= tile_xy[0] <= display_rect_for_tiles[0][1] and
-                            display_rect_for_tiles[1][0] <= tile_xy[1] <= display_rect_for_tiles[1][1]):
-                        # за экраном
-                        continue
+                    # if not (display_rect_for_tiles[0][0] <= tile_xy[0] <= display_rect_for_tiles[0][1] and
+                    #         display_rect_for_tiles[1][0] <= tile_xy[1] <= display_rect_for_tiles[1][1]):
+                    #     # за экраном
+                    #     continue
                     tiles.append(tile)
                     # display.blit(tile_index[tile[1]], (tile[0][0] * 16 - scroll[0], tile[0][1] * 16 - scroll[1]))
                     # tile_xy =
