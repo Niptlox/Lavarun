@@ -1,8 +1,9 @@
 import Game
-import Window
+from UI import Window
+
 
 def main():
-    game = Game(Window.SIZE)
+    game = Game.Game(Window.SIZE)
     game.main()
 
 

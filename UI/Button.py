@@ -50,16 +50,17 @@ class Button(pygame.sprite.Sprite):
 
     def update(self, *args):
         if args:
+            but = 1
             event = args[0]
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == but:
                 if self.mauseDownButton:
                     self.click()
                 self.mauseDownButton = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == but:
                 if self.screenRect.collidepoint(event.pos):
                     self.mauseInButton = True
                     self.mauseDownButton = True
-            if event.type == pygame.MOUSEMOTION:
+            if event.type == pygame.MOUSEMOTION :
                 if self.mauseInButton:
                     if not self.screenRect.collidepoint(event.pos):
                         self.mauseInButton = False
@@ -83,3 +84,6 @@ class Button(pygame.sprite.Sprite):
     def inButton(self):
         if self.imgInB:
             self.image = self.imgInB
+
+    def redraw(self):
+        pass

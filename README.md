@@ -1,3 +1,0 @@
-# Lavarun
-Is the python game of lib pygame. It`s runner on lava)
-This is the master brunch...
