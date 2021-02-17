@@ -25,13 +25,14 @@ class Game(Window):
             self.scene = self.startMenu
         elif self.phasa == P_GAMELOOP:
             self.frameGame.newGame(-1)
+            self.frameGame.world.clear_map()
             self.scene = self.frameGame
 
     def initGame(self):
         import World
         self.startMenu = StartMenu(self.size, lambda :self.setPhasa(P_GAMELOOP))
         world = World.World(display_size=self.size)
-        self.frameGame = World.GameFrame(((0, 0), self.size), world)
+        self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda :self.setPhasa(P_MENUSTART))
         self.setPhasa(P_MENUSTART)
         # self.setPhasa(P_GAMELOOP)
 

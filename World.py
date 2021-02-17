@@ -9,9 +9,12 @@ TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 CHUNK_SIZE = 16
 
 N_DIRT = 1
+# со всеми с кем взамидоцствуем 100 < N < 200
+N_SPIKE = 101
 path_tile = r"data\sprites\tiles\\"
 tiles_frames = {
-    N_DIRT: get_texture_size(path_tile + "dirt.png", size=TILE_SIZEL)
+    N_DIRT: get_texture_size(path_tile + "dirt.png", size=TILE_SIZEL),
+    N_SPIKE: get_texture_size(path_tile + "spike.png", size=TILE_SIZEL, colorkey=COLORKEY)
 }
 
 PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE * 0.95, TILE_SIZE * 2 * 0.95)))
@@ -20,7 +23,7 @@ colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 player_frames = {
 
     "run": load_animation(path_player + r"run\run", [4, 3, 4], size=PLAYER_RECT.size),
-"idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI)
+    "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI)
 }
 
 
@@ -29,6 +32,14 @@ def collision_test(rect, tiles):
     for tile in tiles:
         if rect.colliderect(tile):
             hit_list.append(tile)
+    return hit_list
+
+
+def collision_test_entitys(rect, entitys):
+    hit_list = []
+    for tile_rect, tile_type in entitys:
+        if rect.colliderect(tile_rect):
+            hit_list.append((tile_rect, tile_type))
     return hit_list
 
 
@@ -77,7 +88,6 @@ class Entity(EntityStatic):
         super().__init__(rect, animation, animation_action)
 
 
-
 class Player(Entity):
     def __init__(self, xy):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
@@ -85,18 +95,29 @@ class Player(Entity):
         self.jump_speed = 9 / 32 * TILE_SIZE  # скорость при старте прыжка
         self.speed = 4 / 32 * TILE_SIZE  # скорость ходения
         self.gravity = 0.4 / 32 * TILE_SIZE  # скорость падения
+        self.alive = True
+        self.max_oxygen = 5000
+        self.oxygen = self.max_oxygen
+        self.oxygen_normal_spending = 1
+        self.oxygen_jump_spending = 20
+        self.oxygen_jump_speed = 6 / 32 * TILE_SIZE
+        self.surface_oxygen_bar = pygame.Surface((200, 30))
 
     def new_game(self):
         super().new_game()
         self.moving_right = False
         self.moving_left = False
+        self.tap_oxygen_jump = False
+        self.double_jump = False
         self.air_timer = 0
         self.vertical_momentum = 0
         self.player_flip = 0
+        self.oxygen = self.max_oxygen
 
     def update(self, *args, **kwargs):
         if args:
             event = args[0]
+            self.tap_oxygen_jump = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     self.moving_right = True
@@ -105,15 +126,27 @@ class Player(Entity):
                 if event.key == pygame.K_UP:
                     if self.air_timer < 6:
                         self.vertical_momentum = -self.jump_speed
+                    # elif not self.double_jump:
+                    #     self.vertical_momentum = -self.jump_speed
+                    #     self.double_jump = True
+
+                if event.key == pygame.K_SPACE:
+                    self.tap_oxygen_jump = True
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.moving_right = False
                 if event.key == pygame.K_LEFT:
                     self.moving_left = False
+                if event.key == pygame.K_SPACE:
+                    self.tap_oxygen_jump = False
         else:
             self.new_tick(**kwargs)
 
-    def new_tick(self, timeTick=None, tile_rects=[]):
+    def new_tick(self, timeTick=None, tile_rects=[], entitys=[]):
+        if self.tap_oxygen_jump and self.vertical_momentum > -self.oxygen_jump_speed:
+            self.vertical_momentum -= self.oxygen_jump_speed
+            self.oxygen -= self.oxygen_jump_spending
         player_movement = [0, 0]
         if self.moving_right == True:
             player_movement[0] += self.speed
@@ -140,20 +173,40 @@ class Player(Entity):
         if collisions['bottom'] == True:
             self.air_timer = 0
             self.vertical_momentum = 0
+            self.double_jump = False
         else:
             self.air_timer += 1
         if collisions["top"] == True:
             self.vertical_momentum = 0
-
+        self.oxygen -= self.oxygen_normal_spending
+        hit_list = collision_test_entitys(self.rect, entitys)
+        for entity in hit_list:
+            if entity[1] == N_SPIKE:
+                self.damage(1)
+        if self.oxygen < 0:
+            self.damage(1)
         # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         self.update_image()
         return true_movement
 
+    def damage(self, hp_damage=1):
+        self.alive = False
+
     def update_image(self):
         player_img = self.animation[self.animation_action][self.num_frame]
         self.image = pygame.transform.flip(player_img, self.player_flip, False)
-        self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
-        print("num_frame", self.num_frame)
+        if self.air_timer < 6:
+            self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
+        else:
+            self.num_frame = 0
+        self.surface_oxygen_bar.fill((50, 50, 100))
+        wbord = 2
+        w, h = self.surface_oxygen_bar.get_size()
+        pygame.draw.rect(self.surface_oxygen_bar, (50, 200, 250),
+                         (wbord, wbord, int((w - 2 * wbord) * self.oxygen / self.max_oxygen), h - 2 * wbord))
+        pygame.draw.rect(self.surface_oxygen_bar, (110, 0, 50), (0, 0, w, h ), wbord)
+        print("self.oxygen", self.oxygen)
+        # print("num_frame", self.num_frame)
 
     def move(self, rect, movement, tiles):
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
@@ -180,7 +233,8 @@ class Player(Entity):
 
 
 class World:
-    COF_CAMERA_FRICTION = 0.15
+    COF_CAMERA_FRICTION = 0.1  # коофицент для скольжения камеры
+
     def __init__(self, level=-1, game_map={}, display_size=(720, 480)):
         self.game_map = game_map
         self.level = level
@@ -209,6 +263,8 @@ class World:
     def generation_chunk(self, xy, level=-1):
         x, y = xy
         chunk_data = []
+        # if x + y == 0:
+        #     return chunk_data
         i = 0
         m_a_g = [None] * CHUNK_SIZE
         for y_pos in range(CHUNK_SIZE - 1, -1, -1):
@@ -216,8 +272,12 @@ class World:
                 target_x = x * CHUNK_SIZE + x_pos
                 target_y = y * CHUNK_SIZE + y_pos
                 tile_type = 0  # nothing
-                if target_y == 6 and randint(0, 3) == 1:
+                if target_y == 6 and randint(0, 2) == 1:
                     tile_type = N_DIRT
+                if target_y == 3 and randint(0, 3) == 1:
+                    tile_type = N_DIRT
+                if target_y == 8 and randint(0, 7) == 1:
+                    tile_type = N_SPIKE
                 if target_y > 8:
                     tile_type = N_DIRT  # dirt
                 if tile_type != 0:
@@ -229,8 +289,11 @@ class World:
         self.game_map = game_map if game_map is not None else self.game_map
         self.level = level if level is not None else self.level
         self.scroll = [0, 0]
-        self.player = Player((self.display_size[0] // 2, self.display_size[1] // 2))
+        self.player = Player((self.display_size[0] // 2 * 0, self.display_size[1] // 2))
         self.player.new_game()
+
+    def clear_map(self):
+        self.game_map = {}
 
     def update(self):
         # Скользящие перемещение камеры
@@ -245,7 +308,10 @@ class World:
         # Обновление, нахождение, всех спрайтов на экране
         self.tile_rects, self.tiles, self.entitys = self.update_display(scroll, self.display_size)
         # Обновление игрока, движение и тд
-        self.player.update(tile_rects=self.tile_rects)
+        self.player.update(tile_rects=self.tile_rects, entitys=self.entitys)
+        if not self.player.alive:
+            return False
+        return True
 
     def redraw(self, surface):
         self.display.fill((146, 144, 255))
@@ -256,6 +322,7 @@ class World:
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
         self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.rect.y - scroll[1]))
         surface.blit(pygame.transform.scale(self.display, surface.get_size()), (0, 0))
+        surface.blit(self.player.surface_oxygen_bar, (20, 20))
 
     def get_event(self, event):
         self.player.update(event)
@@ -293,16 +360,19 @@ class World:
 
 
 class GameFrame(Frame):
-    def __init__(self, rect, world):
+    def __init__(self, rect, world, to_main_menu=None):
         super().__init__(rect, bg=BLACK)
         self.world = world
+        self.to_main_menu = to_main_menu
 
     def update(self, args):
         self.world.get_event(args)
 
     def redraw(self):
-        self.world.update()
+        running = self.world.update()
         self.world.redraw(self.image)
+        if not running:
+            self.to_main_menu()
 
     def newGame(self, level):
         self.world.new_game(level=level)

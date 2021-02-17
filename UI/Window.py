@@ -2,6 +2,8 @@ import pygame
 
 
 SIZE = (700, 400)
+SIZE = (800, 500)
+
 class Window:
     RECT = pygame.Rect(((0, 0), SIZE))
 

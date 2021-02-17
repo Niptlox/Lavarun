@@ -68,15 +68,13 @@ class Button(pygame.sprite.Sprite):
                 else:
                     if self.screenRect.collidepoint(event.pos):
                         self.mauseInButton = True
-        if self.mauseDownButton:
-            self.image = self.imgDownB
-        elif self.mauseInButton:
-            self.image = self.imgInB
-        else:
-            self.image = self.imgUpB
+        self.redraw()
 
     def click(self):
         if self.func:
+            self.mauseInButton = False
+            self.mauseDownButton = False
+            self.redraw()
             self.func()
         else:
             print("Button down, but function not defined!!!")
@@ -86,4 +84,10 @@ class Button(pygame.sprite.Sprite):
             self.image = self.imgInB
 
     def redraw(self):
-        pass
+        if self.mauseDownButton:
+            self.image = self.imgDownB
+        elif self.mauseInButton:
+            self.image = self.imgInB
+        else:
+            self.image = self.imgUpB
+
