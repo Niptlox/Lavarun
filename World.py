@@ -1,7 +1,7 @@
 import pygame
 
 from Texture import *
-from Entitys import *
+from Entities import *
 from Chank import *
 from UI.Frame import *
 from math import ceil  # округление в большую сторону
