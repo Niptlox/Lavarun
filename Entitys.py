@@ -120,9 +120,9 @@ class Player(Entity):
                     self.tap_oxygen_jump = True
 
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = False
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
                 if event.key == pygame.K_SPACE:
                     self.tap_oxygen_jump = False
