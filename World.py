@@ -9,7 +9,7 @@ from math import ceil  # округление в большую сторону
 
 
 class World:
-    COF_CAMERA_FRICTION = 0.1  # коофицент для скольжения камеры
+    COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
 
     def __init__(self, level=-1, game_map={}, display_size=(720, 480)):
         self.game_map = game_map
