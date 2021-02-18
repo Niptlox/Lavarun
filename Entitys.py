@@ -88,6 +88,8 @@ class Player(Entity):
         self.oxygen_jump_spending = 20
         self.oxygen_jump_speed = 6 / 32 * TILE_SIZE
         self.surface_oxygen_bar = pygame.Surface((200, 30))
+        self.surface_score = pygame.Surface((200, 30))
+        self.score = 0
 
     def new_game(self):
         super().new_game()
@@ -108,7 +110,8 @@ class Player(Entity):
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = True
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.moving_left = True
+                    #self.moving_left = True
+                    pass
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     if self.air_timer < 6:
                         self.vertical_momentum = -self.jump_speed
@@ -167,7 +170,7 @@ class Player(Entity):
         self.oxygen -= self.oxygen_normal_spending
         hit_list = collision_test_entitys(self.rect, entitys)
         for entity in hit_list:
-            if entity[1] == N_SPIKE:
+            if entity[1] in (N_SPIKE, N_LAVA):
                 self.damage(1)
         if self.oxygen < 0:
             self.damage(1)

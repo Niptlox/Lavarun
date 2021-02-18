@@ -3,6 +3,8 @@ import os
 import sys
 from pygame import Color
 pygame.init()
+pygame.font.init()
+
 
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
@@ -11,6 +13,9 @@ WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 
 COLORKEY = GREEN
+
+TEXTFONT = pygame.font.SysFont('serif', 38)
+
 
 
 def isColor(arg):
