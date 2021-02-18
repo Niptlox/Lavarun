@@ -22,7 +22,7 @@ path_player = r"data\sprites\player\\"
 colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 player_frames = {
 
-    "run": load_animation(path_player + r"run\run", [4, 3, 4], size=PLAYER_RECT.size),
+    "run": load_animation(path_player + r"run\run", [4, 3, 4, 3], size=PLAYER_RECT.size),
     "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI)
 }
 
@@ -267,7 +267,10 @@ class World:
         #     return chunk_data
         i = 0
         m_a_g = [None] * CHUNK_SIZE
+        # m_a_g_old = [None] * CHUNK_SIZE
         for y_pos in range(CHUNK_SIZE - 1, -1, -1):
+            m_a_g_old = m_a_g
+            m_a_g = [None] * CHUNK_SIZE
             for x_pos in range(CHUNK_SIZE):
                 target_x = x * CHUNK_SIZE + x_pos
                 target_y = y * CHUNK_SIZE + y_pos
@@ -280,9 +283,14 @@ class World:
                     tile_type = N_SPIKE
                 if target_y > 8:
                     tile_type = N_DIRT  # dirt
+                if tile_type == 0:
+                    if m_a_g_old[x_pos] == N_DIRT or randint(0, 5) == 1:
+                        tile_type == N_SPIKE
                 if tile_type != 0:
                     chunk_data.append([[target_x, target_y], tile_type])
+                m_a_g[x_pos] = tile_type
                 i += 1
+
         return chunk_data
 
     def new_game(self, game_map=None, level=None):
