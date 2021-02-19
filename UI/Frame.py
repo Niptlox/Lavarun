@@ -94,6 +94,24 @@ class Frame(pygame.sprite.Sprite):
         self.groupObjs.add(item)
         # self.frames.append(item)
 
+    def convert_func_coords(self, xy, static_size):
+        x, y = xy
+        sw, sh = static_size
+        x = int(x * self.rect.w / sw)
+        y = int(y * self.rect.h / sh)
+        return x, y
+
+    # Перещёт координат из прцентов
+    def proc_coords(self, proc_xy):
+        x, y = self.rect.w * proc_xy[0], self.rect.h * proc_xy[1]
+        return x, y
+
+    def start_scene(self, window):
+        pass
+
+    def quit(self):
+        pass
+
 
 
 

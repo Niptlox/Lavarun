@@ -1,8 +1,9 @@
 import pygame
 
+STATIC_SIZE = (800, 500)
 
+SIZE = STATIC_SIZE
 SIZE = (700, 400)
-SIZE = (800, 500)
 
 class Window:
     RECT = pygame.Rect(((0, 0), SIZE))
@@ -27,6 +28,9 @@ class Window:
         if self.phasa is None:
             self.scene = None
 
+    def newScene(self):
+        self.scene.start_scene(self)
+
     def initGame(self):
         self.setPhasa(None)
 
@@ -36,6 +40,7 @@ class Window:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.scene.quit()
                     running = False
                 self.scene.update(event)
 

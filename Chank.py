@@ -6,6 +6,33 @@ LEVEL_PATTERN = -2
 
 CHUNK_SIZE = 16
 
+TYPE_TXT = ".pat"
+PATTERNS_PATH = "data\\patterns\\"
+
+
+def load_pattern(name, typep=TYPE_TXT):
+    if typep == TYPE_TXT:
+        file_path = PATTERNS_PATH + name + typep
+        with open(file_path) as f:
+            ar_pat = f.read().split("\n")
+            print(ar_pat)
+            y = 0
+            out_ar = [[None] * CHUNK_SIZE for i in range(CHUNK_SIZE)]
+            for st in ar_pat:
+                a_st = [None] * CHUNK_SIZE
+                x = 0
+                for char in st:
+                    if char != " ":
+                        a_st[x] = tiles_chars.get(char, N_NONE)
+                    x += 1
+                out_ar[y] = a_st
+                y += 1
+        return out_ar
+
+
+START_PATTERN = load_pattern("Start")
+
+
 
 def generation_chunk(xy, level=-1):
     if level == LEVEL_AUTO:
@@ -14,9 +41,17 @@ def generation_chunk(xy, level=-1):
         chunk_data = pattern_generation(xy)
     return chunk_data
 
+def get_chank_of_pattern(xy, pattern):
+    chank = [((x + xy[0], y + xy[1]), pattern[y][x])
+             for y in range(CHUNK_SIZE) for x in range(CHUNK_SIZE)
+             if pattern[y][x] is not None]
+    return chank
+
 
 def auto_generation(xy):
     x, y = xy
+    if x == 0 and y == 0:
+        return get_chank_of_pattern(xy, START_PATTERN)
     chunk_data = []
     i = 0
     m_a_g = [None] * CHUNK_SIZE

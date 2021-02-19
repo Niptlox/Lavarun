@@ -14,7 +14,7 @@ BLACK = (0,0,0)
 
 COLORKEY = GREEN
 
-TEXTFONT = pygame.font.SysFont('serif', 38)
+TEXTFONT = pygame.font.SysFont('serif', 18)
 
 
 

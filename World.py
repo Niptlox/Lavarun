@@ -3,10 +3,14 @@ import pygame
 from Texture import *
 from Entities import *
 from Chank import *
+from DataLoader import *
 from UI.Frame import *
 from math import ceil  # округление в большую сторону
+import pickle
 
-
+HARD = 3
+NORMAL = 2
+EASY = 1
 
 class World:
     COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
@@ -25,8 +29,7 @@ class World:
         self.tile_rects = []  # для отображения физики
         self.tiles = []  # для отображения на экран
         self.entitys = []  # для взаимодействий
-
-        self.player = None
+        self.player = Player((0, 0))
 
     def get_chunk(self, xy):
         if xy not in self.game_map:
@@ -44,8 +47,8 @@ class World:
         self.game_map = game_map if game_map is not None else self.game_map
         self.level = level if level is not None else self.level
         self.scroll = [0, 0]
-        self.player = Player((self.display_size[0] // 2 * 0, self.display_size[1] // 2))
         self.player.new_game()
+        self.player.set_xy((self.display_size[0] // 2, self.display_size[1] // 2))
 
     def clear_map(self):
         self.game_map = {}
@@ -65,6 +68,7 @@ class World:
         # Обновление игрока, движение и тд
         self.player.update(tile_rects=self.tile_rects, entitys=self.entitys)
         if not self.player.alive:
+            self.save_data()
             return False
         return True
 
@@ -78,6 +82,7 @@ class World:
         self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.rect.y - scroll[1]))
         surface.blit(pygame.transform.scale(self.display, surface.get_size()), (0, 0))
         surface.blit(self.player.surface_oxygen_bar, (20, 20))
+        surface.blit(self.player.surface_score, (self.display_size[0] - 120 , 20))
 
     def get_event(self, event):
         self.player.update(event)
@@ -113,6 +118,11 @@ class World:
                         entitys.append((rect, tile[1]))
         return tile_rects, tiles, entitys
 
+    def save_data(self):
+        max_score = max(get_max_score(), self.player.score)
+        put_max_score(max_score)
+
+
 
 class GameFrame(Frame):
     def __init__(self, rect, world, to_main_menu=None):
@@ -129,5 +139,8 @@ class GameFrame(Frame):
         if not running:
             self.to_main_menu()
 
-    def newGame(self, level):
+    def newGame(self, level, difficulty=1):
         self.world.new_game(level=level)
+
+    def quit(self):
+        self.world.save_data()

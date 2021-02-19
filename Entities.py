@@ -68,6 +68,9 @@ class EntityStatic(pygame.sprite.Sprite):
         else:
             self.new_tick()
 
+    def set_xy(self, xy):
+        self.rect.x, self.rect.y = xy
+
 
 class Entity(EntityStatic):
     def __init__(self, rect: pygame.Rect, animation: dict, animation_action="idle"):
@@ -78,17 +81,17 @@ class Player(Entity):
     def __init__(self, xy):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
-        self.jump_speed = 9 / 32 * TILE_SIZE  # скорость при старте прыжка
-        self.speed = 4 / 32 * TILE_SIZE  # скорость ходения
-        self.gravity = 0.4 / 32 * TILE_SIZE  # скорость падения
+        self.jump_speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость при старте прыжка
+        self.speed = 4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость ходения
+        self.gravity = 0.4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость падения
         self.alive = True
         self.max_oxygen = 5000
         self.oxygen = self.max_oxygen
         self.oxygen_normal_spending = 1
         self.oxygen_jump_spending = 20
-        self.oxygen_jump_speed = 6 / 32 * TILE_SIZE
+        self.oxygen_jump_speed = 6 / STATIC_TILE_SIZE * TILE_SIZE
         self.surface_oxygen_bar = pygame.Surface((200, 30))
-        self.surface_score = pygame.Surface((200, 30))
+        self.surface_score = pygame.Surface((90, 20))
         self.score = 0
 
     def new_game(self):
@@ -101,6 +104,10 @@ class Player(Entity):
         self.vertical_momentum = 0
         self.player_flip = 0
         self.oxygen = self.max_oxygen
+        self.score = 0
+        self.alive = True
+
+
 
     def update(self, *args, **kwargs):
         if args:
@@ -113,6 +120,7 @@ class Player(Entity):
                     #self.moving_left = True
                     pass
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    # прыжок от земли
                     if self.air_timer < 6:
                         self.vertical_momentum = -self.jump_speed
                     # elif not self.double_jump:
@@ -120,22 +128,27 @@ class Player(Entity):
                     #     self.double_jump = True
 
                 if event.key == pygame.K_SPACE:
-                    self.tap_oxygen_jump = True
+                    # прыжок на кислороде
+                    print("self.vertical_momentum", self.vertical_momentum)
+                    if self.vertical_momentum > -self.oxygen_jump_speed // 2:
+                        self.vertical_momentum -= self.oxygen_jump_speed
+                        self.oxygen -= self.oxygen_jump_spending
+                    # self.tap_oxygen_jump = True
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = False
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_w:
                     self.tap_oxygen_jump = False
         else:
             self.new_tick(**kwargs)
 
     def new_tick(self, timeTick=None, tile_rects=[], entitys=[]):
-        if self.tap_oxygen_jump and self.vertical_momentum > -self.oxygen_jump_speed:
-            self.vertical_momentum -= self.oxygen_jump_speed
-            self.oxygen -= self.oxygen_jump_spending
+        # if self.tap_oxygen_jump and self.vertical_momentum > -self.oxygen_jump_speed:
+        #     self.vertical_momentum -= self.oxygen_jump_speed
+        #     self.oxygen -= self.oxygen_jump_spending
         player_movement = [0, 0]
         if self.moving_right == True:
             player_movement[0] += self.speed
@@ -174,6 +187,7 @@ class Player(Entity):
                 self.damage(1)
         if self.oxygen < 0:
             self.damage(1)
+        self.score = self.rect.x // 100
         # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         self.update_image()
         return true_movement
@@ -194,6 +208,11 @@ class Player(Entity):
         pygame.draw.rect(self.surface_oxygen_bar, (50, 200, 250),
                          (wbord, wbord, int((w - 2 * wbord) * self.oxygen / self.max_oxygen), h - 2 * wbord))
         pygame.draw.rect(self.surface_oxygen_bar, (110, 0, 50), (0, 0, w, h), wbord)
+
+        textScore = TEXTFONT.render(str(self.score), False,
+                          (180, 180, 0))
+        self.surface_score.fill((22, 22, 22))
+        self.surface_score.blit(textScore, (2, 0))
         print("self.oxygen", self.oxygen)
         # print("num_frame", self.num_frame)
 
