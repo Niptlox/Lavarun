@@ -82,17 +82,18 @@ class Player(Entity):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
         self.jump_speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость при старте прыжка
-        self.speed = 4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость ходения
+        self.speed = 4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость хождения
         self.gravity = 0.4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость падения
         self.alive = True
         self.max_oxygen = 5000
         self.oxygen = self.max_oxygen
         self.oxygen_normal_spending = 1
         self.oxygen_jump_spending = 20
-        self.oxygen_jump_speed = 6 / STATIC_TILE_SIZE * TILE_SIZE
+        self.oxygen_jump_speed = 8 / STATIC_TILE_SIZE * TILE_SIZE
         self.surface_oxygen_bar = pygame.Surface((200, 30))
         self.surface_score = pygame.Surface((90, 20))
         self.score = 0
+        self.min_y = -155
 
     def new_game(self):
         super().new_game()
@@ -237,4 +238,9 @@ class Player(Entity):
             elif movement[1] < 0:
                 rect.top = tile.bottom
                 collision_types['top'] = True
+            print(self.rect.y, self.min_y)
+        if self.rect.y < self.min_y:
+            self.rect.y = self.min_y
+            self.vertical_momentum = -self.vertical_momentum
+            collision_types['top'] = True
         return rect, collision_types

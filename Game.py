@@ -33,13 +33,11 @@ class Game(Window):
 
     def initGame(self):
         import World
-        self.startMenu = StartMenu(self.size, lambda :self.setPhasa(P_GAMELOOP_EASY))
+        self.startMenu = StartMenu(self.size, lambda: self.setPhasa(P_GAMELOOP_EASY))
         world = World.World(display_size=self.size)
-        self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda :self.setPhasa(P_MENUSTART))
+        self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda: self.setPhasa(P_MENUSTART))
         self.setPhasa(P_MENUSTART)
         # self.setPhasa(P_GAMELOOP)
-
-
 
 
 if __name__ == '__main__':
