@@ -15,9 +15,10 @@ EASY = 1
 class World:
     COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
 
-    def __init__(self, level=-1, game_map={}, display_size=(720, 480)):
-        self.game_map = game_map
-        self.level = level
+    def __init__(self, display_size=(720, 480)):
+        self.game_map = {}
+        self.level = None
+        self.difficulty = None
         self.display_size = display_size
         self.display = pygame.Surface(display_size)
 
@@ -43,12 +44,34 @@ class World:
         chunk_data = generation_chunk(xy, level)
         return chunk_data
 
-    def new_game(self, game_map=None, level=None):
+    def new_game(self, game_map=None, level=None, difficulty=None):
         self.game_map = game_map if game_map is not None else self.game_map
         self.level = level if level is not None else self.level
-        self.scroll = [0, 0]
+        if difficulty is not None:
+            self.set_difficulty(difficulty)
         self.player.new_game()
         self.player.set_xy((self.display_size[0] // 2, self.display_size[1] // 2))
+        self.scroll = [0, 0]
+
+
+    def set_difficulty(self, diff):
+        self.difficulty = diff
+        player = self.player
+        if diff == EASY:
+            player.max_oxygen = 5000
+            player.oxygen_normal_spending = 1
+            player.oxygen_jump_spending = 20
+            player.score_coff = 1
+        elif diff == NORMAL:
+            player.max_oxygen = 3500
+            player.oxygen_normal_spending = 1
+            player.oxygen_jump_spending = 30
+            player.score_coff = 1.3
+        elif diff == HARD:
+            player.max_oxygen = 1500
+            player.oxygen_normal_spending = 1
+            player.oxygen_jump_spending = 40
+            player.score_coff = 2
 
     def clear_map(self):
         self.game_map = {}
@@ -139,8 +162,8 @@ class GameFrame(Frame):
         if not running:
             self.to_main_menu()
 
-    def newGame(self, level, difficulty=1):
-        self.world.new_game(level=level)
+    def newGame(self, level, diff=NORMAL):
+        self.world.new_game(level=level, difficulty=diff)
 
     def quit(self):
         self.world.save_data()

@@ -10,14 +10,14 @@ pygame.init()
 class StartMenu(Frame):
     background = get_texture(r"data\sprites\bgStart.png")
 
-    def __init__(self, size, funcStart):
+    def __init__(self, size, funcStartEasy, funcStartHard):
         super().__init__(((0, 0), size), self.background)
         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
         xy_but_1 = self.proc_coords((0.08, 0.29))
-        self.butStart = Button(xy_but_1, imgB_up, imgB_in, imgB_down, funcStart, size=(170, 40))
+        self.butStart = Button(xy_but_1, imgB_up, imgB_in, imgB_down, funcStartEasy, size=(170, 40))
         xy_but_2 = xy_but_1[0], xy_but_1[1] + 60
-        self.butStart2 = Button(xy_but_2, imgB_up, imgB_in, imgB_down, lambda: print("START2"), size=(170, 40))
+        self.butStart2 = Button(xy_but_2, imgB_up, imgB_in, imgB_down, funcStartHard, size=(170, 40))
         # xy_labelScore = self.convert_func_coords((300, 120), STATIC_SIZE)
         xy_labelScore = self.proc_coords((0.38, 0.29))
         self.labelScore = Label((xy_labelScore, (170, 30)), bg=BLACK)

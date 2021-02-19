@@ -2,7 +2,7 @@ import pygame
 from Texture import *
 from Tiles import *
 
-PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE * 0.85, TILE_SIZE * 2 * 0.95)))
+PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE * 0.7, TILE_SIZE * 2 * 0.9)))
 path_player = r"data\sprites\player\\"
 colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 s = 4
@@ -93,6 +93,8 @@ class Player(Entity):
         self.surface_oxygen_bar = pygame.Surface((200, 30))
         self.surface_score = pygame.Surface((90, 20))
         self.score = 0
+        # коофицент умножения score
+        self.score_coff = 1
         self.min_y = -155
 
     def new_game(self):
@@ -188,7 +190,7 @@ class Player(Entity):
                 self.damage(1)
         if self.oxygen < 0:
             self.damage(1)
-        self.score = self.rect.x // 100
+        self.score = int(self.rect.x * self.score_coff // 100)
         # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         self.update_image()
         return true_movement
