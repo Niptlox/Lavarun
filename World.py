@@ -12,6 +12,7 @@ HARD = 3
 NORMAL = 2
 EASY = 1
 
+
 class World:
     COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
 
@@ -53,22 +54,22 @@ class World:
         self.player.set_xy((self.display_size[0] // 2, self.display_size[1] // 2))
         self.scroll = [0, 0]
 
-
     def set_difficulty(self, diff):
         self.difficulty = diff
         player = self.player
+        cof = 0.5
         if diff == EASY:
-            player.max_oxygen = 5000
+            player.max_oxygen = 5000 * cof
             player.oxygen_normal_spending = 1
             player.oxygen_jump_spending = 20
             player.score_coff = 1
         elif diff == NORMAL:
-            player.max_oxygen = 3500
+            player.max_oxygen = 3500 * cof
             player.oxygen_normal_spending = 1
             player.oxygen_jump_spending = 30
             player.score_coff = 1.3
         elif diff == HARD:
-            player.max_oxygen = 1500
+            player.max_oxygen = 1500 * cof
             player.oxygen_normal_spending = 1
             player.oxygen_jump_spending = 40
             player.score_coff = 2
@@ -76,7 +77,14 @@ class World:
     def clear_map(self):
         self.game_map = {}
 
-    def update(self):
+    def update(self, *args):
+        if args:
+            self.get_event(*args)
+        else:
+            return self.update_rects()
+
+    def update_rects(self):
+
         # Скользящие перемещение камеры
         offset = (self.display_size[0] // 2 - self.player.rect.w // 2,
                   self.display_size[1] // 2 - self.player.rect.h // 2)
@@ -95,7 +103,7 @@ class World:
             return False
         return True
 
-    def redraw(self, surface):
+    def redraw(self):
         self.display.fill((146, 144, 255))
         for tile in self.tiles:
             xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE - self.scroll[1])
@@ -103,9 +111,12 @@ class World:
             self.display.blit(tiles_frames[type_tile], xy_tile)
         scroll = [int(self.scroll[0]), int(self.scroll[1])]
         self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.rect.y - scroll[1]))
+        self.display.blit(self.player.surface_oxygen_bar, (20, 20))
+        self.display.blit(self.player.surface_score, (self.display_size[0] - 120, 20))
+
+    def draw(self, surface):
+        self.redraw()
         surface.blit(pygame.transform.scale(self.display, surface.get_size()), (0, 0))
-        surface.blit(self.player.surface_oxygen_bar, (20, 20))
-        surface.blit(self.player.surface_score, (self.display_size[0] - 120 , 20))
 
     def get_event(self, event):
         self.player.update(event)
@@ -145,6 +156,13 @@ class World:
         max_score = max(get_max_score(), self.player.score)
         put_max_score(max_score)
 
+    def pause(self):
+        self.player.moving_right = False
+        self.player.moving_left = False
+
+
+P_GAMELOOPW = 1
+P_GAMEPAUSEW = 2
 
 
 class GameFrame(Frame):
@@ -152,18 +170,68 @@ class GameFrame(Frame):
         super().__init__(rect, bg=BLACK)
         self.world = world
         self.to_main_menu = to_main_menu
+        self.phasa = None
+        self.scene = None
+        self.running = True
+        self.initUI()
 
-    def update(self, args):
-        self.world.get_event(args)
+    def initUI(self):
+        self.frame_pause_menu = GamePause(self.proc_size((0.3, 0.5)), self.rect,
+                                          lambda: self.setPhasa(P_GAMELOOPW),
+                                          lambda: self.restart(),
+                                          lambda: self.quit())
+
+    def setPhasa(self, phasa):
+        self.phasa = phasa
+        if self.phasa == P_GAMELOOPW:
+            self.scene = self.world
+        if self.phasa == P_GAMEPAUSEW:
+            self.scene = self.frame_pause_menu
+            self.world.pause()
+
+    def update(self, *args):
+        if args:
+            event = args[0]
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.setPhasa(P_GAMEPAUSEW)
+            self.scene.update(event)
 
     def redraw(self):
-        running = self.world.update()
-        self.world.redraw(self.image)
-        if not running:
+        if self.phasa == P_GAMELOOPW:
+            self.running = self.world.update()
+        self.scene.draw(self.image)
+        if not self.running:
             self.to_main_menu()
+
+    def restart(self):
+        self.setPhasa(P_GAMELOOPW)
+        self.newGame(self.world.level, self.world.difficulty)
 
     def newGame(self, level, diff=NORMAL):
         self.world.new_game(level=level, difficulty=diff)
+        self.setPhasa(P_GAMELOOPW)
+        self.running = True
 
     def quit(self):
         self.world.save_data()
+        self.running = False
+
+
+from UI.Button import *
+
+
+class GamePause(Frame):
+    def __init__(self, size, window_rect, func_back, func_restart, func_menu):
+        bg = get_texture_size(WHITE, size=size)
+        super().__init__(pygame.Rect((0, 0), size), bg=bg)
+        self.set_pos_center(window_rect)
+
+        but_size = self.proc_size((0.6, 0.2))
+        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY)
+        but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY)
+        but_surf_menu = createImageButton(but_size, "Menu"), createImageButton(but_size, "Menu", bg=GRAY)
+        buts = createVSteckButtons(but_size, self.rect.w // 2, 20, 20,
+                                   [but_surf_back, but_surf_restart, but_surf_menu],
+                                   [func_back, func_restart, func_menu])
+        self.add_frames(buts)

@@ -10,6 +10,29 @@ def openImagesButton(nameImg: str, colorkey=COLORKEY):
     return imgUp, imgIn, imgDown
 
 
+def createImageButton(size, text="", bg=BLACK, font=TEXTFONT, text_color=WHITE, colorkey=COLORKEY):
+    surf = get_texture_size(bg, size, colorkey=colorkey)
+
+    texframe = font.render(text, False, text_color)
+    texframe_rect = pygame.Rect(((0, 0), texframe.get_size()))
+    # print("texframe_rect.center", texframe_rect, size)
+    texframe_rect.centerx, texframe_rect.centery = size[0] // 2, size[1] // 2
+    surf.blit(texframe, texframe_rect)
+    return surf
+
+
+def createVSteckButtons(size, center_x, start_y, step, images_buttons, funcs):
+    y = start_y
+    x = center_x - size[0] // 2
+    step += size[1]
+    buts = []
+    for images_button, func in zip(images_buttons, funcs):
+        but = Button((x, y), *images_button, func=func)
+        y += step
+        buts.append(but)
+    return buts
+
+
 class Button(pygame.sprite.Sprite):
     # image = load_image("bomb.png")
     # image_boom = load_image("boom.png")
@@ -23,6 +46,9 @@ class Button(pygame.sprite.Sprite):
         else:
             super().__init__()
         self.imgUpB = get_texture(imgUpB, colorkey=COLORKEY)
+        self.image = self.imgUpB
+        imgDownB = self.imgUpB if imgDownB is None else imgDownB
+        imgInB = self.imgDownB if imgInB is None else imgInB
         self.imgDownB = get_texture(imgDownB, colorkey=COLORKEY)
         self.imgInB = get_texture(imgInB, colorkey=COLORKEY)
 
@@ -60,7 +86,7 @@ class Button(pygame.sprite.Sprite):
                 if self.screenRect.collidepoint(event.pos):
                     self.mauseInButton = True
                     self.mauseDownButton = True
-            if event.type == pygame.MOUSEMOTION :
+            if event.type == pygame.MOUSEMOTION:
                 if self.mauseInButton:
                     if not self.screenRect.collidepoint(event.pos):
                         self.mauseInButton = False
@@ -90,4 +116,3 @@ class Button(pygame.sprite.Sprite):
             self.image = self.imgInB
         else:
             self.image = self.imgUpB
-

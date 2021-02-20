@@ -8,13 +8,11 @@ class Frame(pygame.sprite.Sprite):
     # image = load_image("bomb.png")
     # image_boom = load_image("boom.png")
 
-    def __init__(self, rect, bg=None, group=None):
+    def __init__(self, rect, bg=None, groups=[]):
         # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
         # Это очень важно !!!
-        if group is not None:
-            super().__init__(group)
-        else:
-            super().__init__()
+        super().__init__(*groups)
+
         self.rect = pygame.Rect(rect)
         if bg is not None:
             if isColor(bg):
@@ -94,6 +92,11 @@ class Frame(pygame.sprite.Sprite):
         self.groupObjs.add(item)
         # self.frames.append(item)
 
+    def add_frames(self, items):
+        for item in items:
+            self.groupObjs.add(item)
+        # self.frames.append(item)
+
     def convert_func_coords(self, xy, static_size):
         x, y = xy
         sw, sh = static_size
@@ -105,6 +108,14 @@ class Frame(pygame.sprite.Sprite):
     def proc_coords(self, proc_xy):
         x, y = self.rect.w * proc_xy[0], self.rect.h * proc_xy[1]
         return x, y
+
+    # Перещёт размера из прцентов
+    def proc_size(self, proc_size):
+        w, h = self.rect.w * proc_size[0], self.rect.h * proc_size[1]
+        return w, h
+
+    def set_pos_center(self, rect):
+        self.rect.center = rect.center
 
     def start_scene(self, window):
         pass

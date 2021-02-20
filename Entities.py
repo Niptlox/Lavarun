@@ -82,7 +82,7 @@ class Player(Entity):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
         self.jump_speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость при старте прыжка
-        self.speed = 4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость хождения
+        self.speed = 7 / STATIC_TILE_SIZE * TILE_SIZE  # скорость хождения
         self.gravity = 0.4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость падения
         self.alive = True
         self.max_oxygen = 5000

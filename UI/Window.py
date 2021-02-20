@@ -1,5 +1,7 @@
 import pygame
 
+
+
 STATIC_SIZE = (800, 500)
 
 SIZE = STATIC_SIZE
@@ -49,4 +51,7 @@ class Window:
             pygame.display.flip()
             self.clock.tick(self.fps)
         pygame.quit()
+
+
+
 
