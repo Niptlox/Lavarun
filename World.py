@@ -153,16 +153,20 @@ class World:
         return tile_rects, tiles, entitys
 
     def save_data(self):
-        max_score = max(get_max_score(), self.player.score)
+        max_score = max(get_max_score(), self.get_score())
         put_max_score(max_score)
 
     def pause(self):
         self.player.moving_right = False
         self.player.moving_left = False
 
+    def get_score(self):
+        return self.player.score
+
 
 P_GAMELOOPW = 1
 P_GAMEPAUSEW = 2
+P_GAMEFINISHW = 3
 
 
 class GameFrame(Frame):
@@ -180,6 +184,9 @@ class GameFrame(Frame):
                                           lambda: self.setPhasa(P_GAMELOOPW),
                                           lambda: self.restart(),
                                           lambda: self.quit())
+        self.frame_finish_menu = GameFinish(self.proc_size((0.3, 0.5)), self.rect,
+                                          lambda: self.restart(),
+                                          lambda: self.quit())
 
     def setPhasa(self, phasa):
         self.phasa = phasa
@@ -188,18 +195,25 @@ class GameFrame(Frame):
         if self.phasa == P_GAMEPAUSEW:
             self.scene = self.frame_pause_menu
             self.world.pause()
+        if self.phasa == P_GAMEFINISHW:
+            self.scene = self.frame_finish_menu
+            self.frame_finish_menu.set_score(self.world.get_score())
 
     def update(self, *args):
         if args:
             event = args[0]
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.setPhasa(P_GAMEPAUSEW)
+            if self.phasa == P_GAMELOOPW:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.setPhasa(P_GAMEPAUSEW)
+                        return
             self.scene.update(event)
 
     def redraw(self):
         if self.phasa == P_GAMELOOPW:
-            self.running = self.world.update()
+            live = self.world.update()
+            if not live:
+                self.setPhasa(P_GAMEFINISHW)
         self.scene.draw(self.image)
         if not self.running:
             self.to_main_menu()
@@ -219,6 +233,7 @@ class GameFrame(Frame):
 
 
 from UI.Button import *
+from UI.Text import *
 
 
 class GamePause(Frame):
@@ -226,7 +241,7 @@ class GamePause(Frame):
         bg = get_texture_size(WHITE, size=size)
         super().__init__(pygame.Rect((0, 0), size), bg=bg)
         self.set_pos_center(window_rect)
-
+        self.func_back = func_back
         but_size = self.proc_size((0.6, 0.2))
         but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY)
         but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY)
@@ -235,3 +250,37 @@ class GamePause(Frame):
                                    [but_surf_back, but_surf_restart, but_surf_menu],
                                    [func_back, func_restart, func_menu])
         self.add_frames(buts)
+
+    def update(self, *args):
+        if args:
+            event = args[0]
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                print("event", event)
+                pass
+                self.func_back()
+            super().update(*args)
+
+
+
+class GameFinish(Frame):
+    def __init__(self, size, window_rect, func_restart, func_menu):
+        bg = get_texture_size(WHITE, size=size)
+        super().__init__(pygame.Rect((0, 0), size), bg=bg)
+        self.set_pos_center(window_rect)
+        frame_size = self.proc_size((0.6, 0.2))
+        step = 10
+        xy = [(self.rect.w - frame_size[0]) // 2, step]
+        # self.add_frame(Label((xy, frame_size), text="Score:", bg=WHITE, text_color=BLACK))
+        # xy[1] += frame_size[1]
+        self.frame_score = Label((xy, (frame_size[0], 35)), text="0")#, bg=WHITE, text_color=BLACK)
+        self.add_frame(self.frame_score)
+        xy[1] += frame_size[1] + step
+        but_surf_restart = createImageButton(frame_size, "Restart"), createImageButton(frame_size, "Restart", bg=GRAY)
+        but_surf_menu = createImageButton(frame_size, "Menu"), createImageButton(frame_size, "Menu", bg=GRAY)
+        buts = createVSteckButtons(frame_size, self.rect.w // 2, xy[1], 20,
+                                   [but_surf_restart, but_surf_menu],
+                                   [func_restart, func_menu])
+        self.add_frames(buts)
+
+    def set_score(self, score):
+        self.frame_score.setText("Score: "+ str(score))

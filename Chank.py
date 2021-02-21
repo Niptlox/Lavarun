@@ -18,7 +18,8 @@ def load_pattern(name, typep=TYPE_TXT):
             print(ar_pat)
             y = 0
             out_ar = [[None] * CHUNK_SIZE for i in range(CHUNK_SIZE)]
-            for st in ar_pat:
+
+            for st in (ar_pat[i] for i in range(CHUNK_SIZE)):
                 a_st = [None] * CHUNK_SIZE
                 x = 0
                 for char in st:
@@ -31,7 +32,8 @@ def load_pattern(name, typep=TYPE_TXT):
 
 
 START_PATTERN = load_pattern("Start")
-
+PLAT_PATTERN = load_pattern("Plat")  # металичская платформа...
+print("PLAT_PATTERN", PLAT_PATTERN)
 
 
 def generation_chunk(xy, level=-1):
@@ -41,18 +43,27 @@ def generation_chunk(xy, level=-1):
         chunk_data = pattern_generation(xy)
     return chunk_data
 
+
 def get_chank_of_pattern(xy, pattern):
     chank = [((x + xy[0], y + xy[1]), pattern[y][x])
              for y in range(CHUNK_SIZE) for x in range(CHUNK_SIZE)
              if pattern[y][x] is not None]
+    # print(*chank, sep="\n")
     return chank
 
-
 def auto_generation(xy):
+
     x, y = xy
-    if x == 0 and y == 0:
-        return get_chank_of_pattern(xy, START_PATTERN)
+    print("auto_generation", xy)
     chunk_data = []
+    tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
+    if x == 0 and y == 0:
+        chunk_data = get_chank_of_pattern(tile_xy, START_PATTERN)
+    if x != 0 and y == 0 and randint(1, 2) == 1 and x % 2 == 0:
+        chunk_data = get_chank_of_pattern(tile_xy, PLAT_PATTERN)
+    if chunk_data:
+        print(chunk_data)
+        return chunk_data
     i = 0
     m_a_g = [None] * CHUNK_SIZE
     old_tile_type = None

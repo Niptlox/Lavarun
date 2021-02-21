@@ -120,7 +120,7 @@ class Player(Entity):
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.moving_right = True
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    #self.moving_left = True
+                    self.moving_left = True
                     pass
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     # прыжок от земли
@@ -216,7 +216,7 @@ class Player(Entity):
                           (180, 180, 0))
         self.surface_score.fill((22, 22, 22))
         self.surface_score.blit(textScore, (2, 0))
-        print("self.oxygen", self.oxygen)
+        # print("self.oxygen", self.oxygen)
         # print("num_frame", self.num_frame)
 
     def move(self, rect, movement, tiles):
@@ -240,7 +240,7 @@ class Player(Entity):
             elif movement[1] < 0:
                 rect.top = tile.bottom
                 collision_types['top'] = True
-            print(self.rect.y, self.min_y)
+            # print(self.rect.y, self.min_y)
         if self.rect.y < self.min_y:
             self.rect.y = self.min_y
             self.vertical_momentum = -self.vertical_momentum
