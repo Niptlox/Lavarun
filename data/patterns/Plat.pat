@@ -3,7 +3,7 @@
 
     0000000
     ooooooo
-    ooooooo
+    ooo%ooo
     0000000
     ooooooo
     ooooooo

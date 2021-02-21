@@ -18,6 +18,7 @@ class World:
 
     def __init__(self, display_size=(720, 480)):
         self.game_map = {}
+        # при level < 0  авто генерация, иначе из файла
         self.level = None
         self.difficulty = None
         self.display_size = display_size
@@ -31,8 +32,9 @@ class World:
         self.tile_rects = []  # для отображения физики
         self.tiles = []  # для отображения на экран
         self.entitys = []  # для взаимодействий
-        self.player = Player((0, 0))
+        self.player = Player((0, 0), self)
 
+    # получить новый чанк
     def get_chunk(self, xy):
         if xy not in self.game_map:
             if self.level < 0:
@@ -41,10 +43,12 @@ class World:
                 return
         return self.game_map[xy]
 
+    # генерация нового чанка
     def generation_chunk(self, xy, level=-1):
         chunk_data = generation_chunk(xy, level)
         return chunk_data
 
+    # перезапись переменных для начала новой игры
     def new_game(self, game_map=None, level=None, difficulty=None):
         self.game_map = game_map if game_map is not None else self.game_map
         self.level = level if level is not None else self.level
@@ -83,8 +87,8 @@ class World:
         else:
             return self.update_rects()
 
+    # обновление экраны и игрока
     def update_rects(self):
-
         # Скользящие перемещение камеры
         offset = (self.display_size[0] // 2 - self.player.rect.w // 2,
                   self.display_size[1] // 2 - self.player.rect.h // 2)
@@ -114,13 +118,25 @@ class World:
         self.display.blit(self.player.surface_oxygen_bar, (20, 20))
         self.display.blit(self.player.surface_score, (self.display_size[0] - 120, 20))
 
+    def del_obj(self, xy_tile, i_tile):
+        xy_chank = xy_tile[0] // CHUNK_SIZE_DIS, xy_tile[1] // CHUNK_SIZE_DIS
+        print("del_obj", xy_chank, xy_tile, i_tile)
+        self.game_map[xy_chank][i_tile] = None
+
+    def replace_obj(self, tile_type, xy_tile, i_tile):
+        xy_chank = xy_tile[0] // CHUNK_SIZE_DIS, xy_tile[1] // CHUNK_SIZE_DIS
+        tile = self.game_map[xy_chank][i_tile]
+        self.game_map[xy_chank][i_tile] = (tile[0], tile_type)
+
     def draw(self, surface):
         self.redraw()
         surface.blit(pygame.transform.scale(self.display, surface.get_size()), (0, 0))
 
+    # получение события из pygame
     def get_event(self, event):
         self.player.update(event)
 
+    # ОБНОВЛЕНИЕ прямоугольников и объектов на дисплее,
     def update_display(self, scroll, display_size):
         self.tile_rects = tile_rects = []  # для отображения физики
         self.tiles = tiles = []  # для отображения на экран
@@ -133,7 +149,11 @@ class World:
                 target_y = y + int(round(scroll[1] / (CHUNK_SIZE * TILE_SIZE))) - 1
                 target_chunk = (target_x, target_y)
                 chank = self.get_chunk(target_chunk)
+                i_tile = 0
                 for tile in chank:
+                    if tile is None:
+                        i_tile += 1
+                        continue
                     tile_xy = tile[0]
                     # if not (display_rect_for_tiles[0][0] <= tile_xy[0] <= display_rect_for_tiles[0][1] and
                     #         display_rect_for_tiles[1][0] <= tile_xy[1] <= display_rect_for_tiles[1][1]):
@@ -146,12 +166,14 @@ class World:
                         # твердые блоки по типу земли
                         rect = pygame.Rect(tile_xy[0] * TILE_SIZE, tile_xy[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
                         tile_rects.append(rect)
-                    if 101 <= tile[1] < 200:
+                    if 101 <= abs(tile[1]) < 200:
                         # может твердые а может и нет, обекты для взаимного действия, допустим человечки
                         rect = pygame.Rect(tile_xy[0] * TILE_SIZE, tile_xy[1] * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                        entitys.append((rect, tile[1]))
+                        entitys.append((rect, tile[1], i_tile))
+                    i_tile += 1
         return tile_rects, tiles, entitys
 
+    # сохранение данных игры
     def save_data(self):
         max_score = max(get_max_score(), self.get_score())
         put_max_score(max_score)
@@ -220,6 +242,7 @@ class GameFrame(Frame):
 
     def restart(self):
         self.setPhasa(P_GAMELOOPW)
+        self.world.clear_map()
         self.newGame(self.world.level, self.world.difficulty)
 
     def newGame(self, level, diff=NORMAL):

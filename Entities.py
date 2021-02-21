@@ -23,9 +23,9 @@ def collision_test(rect, tiles):
 
 def collision_test_entitys(rect, entitys):
     hit_list = []
-    for tile_rect, tile_type in entitys:
-        if rect.colliderect(tile_rect):
-            hit_list.append((tile_rect, tile_type))
+    for entity in entitys:
+        if rect.colliderect(entity[0]):
+            hit_list.append(entity)
     return hit_list
 
 
@@ -78,7 +78,7 @@ class Entity(EntityStatic):
 
 
 class Player(Entity):
-    def __init__(self, xy):
+    def __init__(self, xy, world):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
         self.jump_speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость при старте прыжка
@@ -96,6 +96,7 @@ class Player(Entity):
         # коофицент умножения score
         self.score_coff = 1
         self.min_y = -155
+        self.world = world
 
     def new_game(self):
         super().new_game()
@@ -110,8 +111,7 @@ class Player(Entity):
         self.score = 0
         self.alive = True
 
-
-
+    # проверека событий pygame
     def update(self, *args, **kwargs):
         if args:
             event = args[0]
@@ -184,16 +184,34 @@ class Player(Entity):
         if collisions["top"] == True:
             self.vertical_momentum = 0
         self.oxygen -= self.oxygen_normal_spending
+
         hit_list = collision_test_entitys(self.rect, entitys)
         for entity in hit_list:
             if entity[1] in (N_SPIKE, N_LAVA):
                 self.damage(1)
+            elif entity[1] == N_OXYGEN:
+                self.take_oxygen_bulloon(entity)
         if self.oxygen < 0:
             self.damage(1)
-        self.score = int(self.rect.x * self.score_coff // 100)
+
+        self.score = max(self.score, int(self.rect.x * self.score_coff // 100))
         # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         self.update_image()
         return true_movement
+
+    def take_oxygen_bulloon(self, entity):
+        self.replace_obj(entity)
+        self.oxygen = min(self.oxygen + OXYGEN_COUNT, self.max_oxygen)
+
+    def del_obj(self, entity):
+        r = entity[0]  # rect
+        i = entity[2]
+        self.world.del_obj((r.x, r.y), i)
+
+    def replace_obj(self, entity):
+        r = entity[0]  # rect
+        i = entity[2]
+        self.world.replace_obj(N_METAL_BG, (r.x, r.y), i)
 
     def damage(self, hp_damage=1):
         self.alive = False

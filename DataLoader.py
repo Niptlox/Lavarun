@@ -12,7 +12,7 @@ def checking_file():
 
 def get_max_score():
     data_new = get_dict_data()
-    max_score_f = data_new.get("max_score", -1)
+    max_score_f = data_new.get("max_score", 0)
     return max_score_f
 
 

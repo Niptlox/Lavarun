@@ -6,7 +6,8 @@ STATIC_TILE_SIZE = 32
 TILE_SIZE = 40
 TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 
-
+N_OXYGEN = -101
+OXYGEN_COUNT = 500
 
 N_DIRT = 1
 N_METAL = 2
@@ -22,15 +23,16 @@ tiles_frames = {
     N_METAL_BG: get_texture_size(path_tile + "metal_bg.png", size=TILE_SIZEL),
     N_NONE: get_texture_size(path_tile + "none.png", size=TILE_SIZEL),
     N_SPIKE: get_texture_size(path_tile + "spike.png", size=TILE_SIZEL, colorkey=COLORKEY),
-    N_LAVA: get_texture_size(path_tile + "lava.png", size=TILE_SIZEL, colorkey=COLORKEY)
+    N_LAVA: get_texture_size(path_tile + "lava.png", size=TILE_SIZEL, colorkey=COLORKEY),
+    N_OXYGEN: get_texture_size(path_tile + "oxygen.png", size=TILE_SIZEL, colorkey=COLORKEY)
 }
-
 
 tiles_chars = {
     "#": N_DIRT,
     "w": N_SPIKE,
     "+": N_LAVA,
     "0": N_METAL,
-    "o": N_METAL_BG,
+    "o": N_METAL_BG,  # english o
+    "%": N_OXYGEN,
     "?": N_NONE
 }

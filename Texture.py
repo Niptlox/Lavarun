@@ -2,6 +2,8 @@ import pygame
 import os
 import sys
 from pygame import Color
+printD = lambda *st, sep=" ", end="\n": print("DEBAG:", *st, sep=sep, end=end)
+
 pygame.init()
 pygame.font.init()
 
