@@ -34,7 +34,7 @@ def load_pattern(name, typep=TYPE_TXT):
 
 START_PATTERN = load_pattern("Start")
 START_PATTERN_1 = load_pattern("Start-1")
-PLAT_PATTERN = load_pattern("Plat")  # металичская платформа...
+PLAT_PATTERN = load_pattern("Plat")  # металлическая платформа...
 print("PLAT_PATTERN", PLAT_PATTERN)
 
 
@@ -65,10 +65,10 @@ def auto_generation(xy):
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:
-        chunk_data = random_chank(xy)
+        chunk_data = random_chunk(xy)
     return chunk_data
 
-def random_chank(xy):
+def random_chunk(xy):
     x, y = xy
     i = 0
     m_a_g = [None] * CHUNK_SIZE
@@ -85,11 +85,12 @@ def random_chank(xy):
                 tile_type = N_DIRT
             elif target_y == 3 and randint(0, 3) == 1:
                 tile_type = N_DIRT
-
             elif target_y == 9 and (randint(0, 5) == 1 or old_tile_type == N_LAVA and randint(0, 10) == 1):
                 tile_type = N_LAVA
-            elif target_y > 8:
-                tile_type = N_DIRT  # dirt
+            elif target_y == 9:
+                tile_type = N_DIRT
+            elif target_y > 9:
+                tile_type = N_DIRTDOWN  # dirt
             elif m_a_g_old[x_pos] == N_DIRT and randint(0, 5) == 1:
                 tile_type = N_SPIKE
             if tile_type != 0:

@@ -53,14 +53,14 @@ class ItemsCreaterMain(Window):
         super().__init__(size)
         self.size = size
 
-    def setPhasa(self, phasa):
-        super().setPhasa(phasa)
+    def setPhase(self, phasa):
+        super().setPhase(phasa)
         if self.phasa == P_MAIN:
             self.scene = self.mainFrame
 
     def initGame(self):
         self.mainFrame = ItemsCreater(Window.RECT)
-        self.setPhasa(P_MAIN)
+        self.setPhase(P_MAIN)
 
 
 if __name__ == '__main__':

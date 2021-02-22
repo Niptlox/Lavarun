@@ -9,7 +9,7 @@ P_MENUSTART = 1
 # играем в бесконечную игры
 P_GAMELOOP_EASY = 10
 P_GAMELOOP_NORMAL = 12
-P_GAMELOOP_HARD = 14
+P_GAMELOOP_HARD = 14 
 # выбираем карту
 P_MENUMAPS = 20
 # Играем на уже созданной карте
@@ -21,9 +21,9 @@ class Game(Window):
         super().__init__(size)
         self.size = size
 
-    def setPhasa(self, phasa):
+    def setPhase(self, phasa):
         import World
-        super().setPhasa(phasa)
+        super().setPhase(phasa)
         if self.phasa == P_MENUSTART:
             self.scene = self.startMenu
         elif self.phasa == P_GAMELOOP_EASY:
@@ -38,16 +38,16 @@ class Game(Window):
 
     def initGame(self):
         import World
-        self.startMenu = StartMenu(lambda: self.setPhasa(P_GAMELOOP_EASY),
-                                   lambda: self.setPhasa(P_GAMELOOP_HARD),
+        self.startMenu = StartMenu(lambda: self.setPhase(P_GAMELOOP_EASY),
+                                   lambda: self.setPhase(P_GAMELOOP_HARD),
                                    self.full_screen,
                                    self.quit)
         # world = World.World(display_size=self.size)
         world = World.World()
-        self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda: self.setPhasa(P_MENUSTART))
+        self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda: self.setPhase(P_MENUSTART))
         self.frameGame.setPhasa(World.P_GAMELOOPW)
-        self.setPhasa(P_MENUSTART)
-        # self.setPhasa(P_GAMELOOP)
+        self.setPhase(P_MENUSTART)
+        # self.setPhase(P_GAMELOOP)
 
 
 

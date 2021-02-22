@@ -44,7 +44,7 @@ class Window:
 
 
 
-    def setPhasa(self, phasa):
+    def setPhase(self, phasa):
         self.phasa = phasa
         if self.phasa is None:
             self.scene = None
@@ -53,7 +53,7 @@ class Window:
         self.scene.start_scene(self)
 
     def initGame(self):
-        self.setPhasa(None)
+        self.setPhase(None)
 
     def mainLoop(self):
         self.clock = pygame.time.Clock()
