@@ -46,12 +46,12 @@ def generation_chunk(xy, level=-1):
     return chunk_data
 
 
-def get_chank_of_pattern(xy, pattern):
-    chank = [((x + xy[0], y + xy[1]), pattern[y][x])
+def get_chunk_of_pattern(xy, pattern):
+    chunk = [((x + xy[0], y + xy[1]), pattern[y][x])
              for y in range(CHUNK_SIZE) for x in range(CHUNK_SIZE)
              if pattern[y][x] is not None]
-    # print(*chank, sep="\n")
-    return chank
+    # print(*chunk, sep="\n")
+    return chunk
 
 def auto_generation(xy):
     x, y = xy
@@ -59,11 +59,11 @@ def auto_generation(xy):
     chunk_data = []
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     if x == 0 and y == 0:
-        chunk_data = get_chank_of_pattern(tile_xy, START_PATTERN)
+        chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN)
     elif x == -1 and y == 0:
-        chunk_data = get_chank_of_pattern(tile_xy, START_PATTERN_1)
+        chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN_1)
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
-        chunk_data = get_chank_of_pattern(tile_xy, PLAT_PATTERN)
+        chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:
         chunk_data = random_chank(xy)
     return chunk_data

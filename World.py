@@ -2,7 +2,7 @@ import pygame
 from UI.Window import STATIC_SIZE
 from Texture import *
 from Entities import *
-from Chank import *
+from Chunk import *
 from DataLoader import *
 from UI.Frame import *
 from math import ceil  # округление в большую сторону
