@@ -1,28 +1,54 @@
 from UI.Button import *
 from UI.Frame import *
 from UI.Text import *
-from UI.Window import STATIC_SIZE
+from UI.Window import SIZE
 from DataLoader import get_max_score
 
 pygame.init()
 
 
+class Menu(Frame):
+    def __init__(self, rect, background, fromXY, puncts, step_xy=(10, 0),
+                 font=TEXTFONT, color_scheme=DEF_COLOR_SCHEME_BUT):
+        super().__init__(rect, self.background)
+        for punct in puncts:
+            text, imgs, func = punct
+            if text is not None:
+                but = Button(rect)
+
+
+
+
 class StartMenu(Frame):
     background = get_texture(r"data\sprites\bgStart.png")
 
-    def __init__(self, size, funcStartEasy, funcStartHard):
-        super().__init__(((0, 0), size), self.background)
+    def __init__(self, funcStartEasy, funcStartHard, funcFullScreen, funcQuit):
+        super().__init__(((0, 0), SIZE), self.background)
+        # super().__init__(SIZE, self.background)
         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
+
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
-        xy_but_1 = self.proc_coords((0.08, 0.29))
-        self.butStart = Button(xy_but_1, imgB_up, imgB_in, imgB_down, funcStartEasy, size=(170, 40))
-        xy_but_2 = xy_but_1[0], xy_but_1[1] + 60
-        self.butStart2 = Button(xy_but_2, imgB_up, imgB_in, imgB_down, funcStartHard, size=(170, 40))
+        size_but = (170, 40)
+        step = 60
+        bx, by = self.proc_coords((0.08, 0.29))
+        self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
+        by += step
+        self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
+        by += step
+        # self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
+        # by += step
         # xy_labelScore = self.convert_func_coords((300, 120), STATIC_SIZE)
+
+        but_surf_full = createImagesButton(size_but, "FullScreen")
+        self.butFullS = Button(((bx, by), size_but), *but_surf_full, func=funcFullScreen)
+        by += step
+        but_surf_quit = createImagesButton(size_but, "Exit")
+        self.butQuit = Button(((bx, by), size_but), *but_surf_quit, func=funcQuit)
+
         xy_labelScore = self.proc_coords((0.38, 0.29))
         self.labelScore = Label((xy_labelScore, (170, 30)), bg=BLACK)
         self.score_update()
-        self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2))
+        self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2, self.butFullS, self.butQuit))
 
     def update(self, *args):
         if args:

@@ -1,6 +1,8 @@
 import pygame
 from Texture import *
 
+DEF_COLOR_SCHEME_BUT = ((WHITE, GRAY, BLACK), (BLACK, BLACK, WHITE))
+
 
 def openImagesButton(nameImg: str, colorkey=COLORKEY):
     path, extension = os.path.splitext(nameImg)
@@ -21,13 +23,20 @@ def createImageButton(size, text="", bg=BLACK, font=TEXTFONT, text_color=WHITE, 
     return surf
 
 
+def createImagesButton(size, text="", color_schema=DEF_COLOR_SCHEME_BUT, font=TEXTFONT, colorkey=COLORKEY):
+    print("color_schema", [(bg, colort) for bg, colort in zip(color_schema[0], color_schema[1])])
+    imgs_but = [createImageButton(size, text, bg, font=font, text_color=colort, colorkey=colorkey)
+                for bg, colort in zip(color_schema[0], color_schema[1])]
+    return imgs_but
+
+
 def createVSteckButtons(size, center_x, start_y, step, images_buttons, funcs):
     y = start_y
     x = center_x - size[0] // 2
     step += size[1]
     buts = []
     for images_button, func in zip(images_buttons, funcs):
-        but = Button((x, y), *images_button, func=func)
+        but = Button(((x, y), size), *images_button, func=func)
         y += step
         buts.append(but)
     return buts
@@ -37,14 +46,19 @@ class Button(pygame.sprite.Sprite):
     # image = load_image("bomb.png")
     # image_boom = load_image("boom.png")
 
-    def __init__(self, xy, imgUpB, imgInB=None, imgDownB=None, func=None, size=None, group=None, screenXY=None):
-        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
-        # Это очень важно !!!
+    def __init__(self, rect, imgUpB, imgInB=None, imgDownB=None, func=None, group=None, screenXY=None):
+        # если рамеры == -1 то берётся размер кнопки
         self.func = func
         if group is not None:
             super().__init__(group)
         else:
             super().__init__()
+        self.rect = rect = pygame.Rect(rect)
+        xy = self.rect.x, self.rect.y
+        if self.rect.w == -1 and self.rect.h == -1:
+            size = None
+        else:
+            size = rect.size
         self.imgUpB = get_texture(imgUpB, colorkey=COLORKEY)
         self.image = self.imgUpB
         imgDownB = self.imgUpB if imgDownB is None else imgDownB

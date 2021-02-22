@@ -1,11 +1,16 @@
 import pygame
+import  os
 
 
+# os.environ['SDL_VIDEO_CENTERED'] = '0'
 
 STATIC_SIZE = (800, 500)
 
 SIZE = STATIC_SIZE
-SIZE = (700, 400)
+# SIZE = (700, 400)
+# SIZE = (1200, 900)
+
+SIZE_COF = (SIZE[0] * SIZE[1]) / (STATIC_SIZE[0] * STATIC_SIZE[1])
 
 class Window:
     RECT = pygame.Rect(((0, 0), SIZE))
@@ -16,6 +21,7 @@ class Window:
         self.phasa = None
         self.scene = None
         self.fps = 30
+        self.inFullScreen = False
         self.initPG()
         self.initGame()
 
@@ -24,6 +30,19 @@ class Window:
 
     def initPG(self):
         self.screen = pygame.display.set_mode(self.size)
+
+    def full_screen(self):
+        pos_x = 400
+        pos_y = 400
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (pos_x, pos_y)
+        os.environ['SDL_VIDEO_CENTERED'] = '0'
+        self.inFullScreen = not self.inFullScreen
+        if self.inFullScreen:
+            self.screen = pygame.display.set_mode(self.size, flags=pygame.FULLSCREEN | pygame.SCALED)
+        else:
+            self.screen = pygame.display.set_mode(self.size)
+
+
 
     def setPhasa(self, phasa):
         self.phasa = phasa
@@ -42,7 +61,7 @@ class Window:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.scene.quit()
+                    self.quit()
                     running = False
                 self.scene.update(event)
 
@@ -51,6 +70,11 @@ class Window:
             pygame.display.flip()
             self.clock.tick(self.fps)
         pygame.quit()
+
+    def quit(self):
+        self.scene.quit()
+        pygame.quit()
+        exit()
 
 
 

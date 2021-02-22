@@ -6,10 +6,11 @@ PLAYER_RECT = pygame.Rect(((0, 0), (TILE_SIZE * 0.7, TILE_SIZE * 2 * 0.9)))
 path_player = r"data\sprites\player\\"
 colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 s = 4
-player_frames = {
 
+player_frames = {
     "run": load_animation(path_player + r"run\jonny_walk", [s, s, s, s], size=PLAYER_RECT.size),
-    "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI)
+    "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI),
+    "fly": load_animation(path_player + r"fly_idle\fly_idle", [3, 3], size=PLAYER_RECT.size, colorkey=colorkeyI)
 }
 
 
@@ -58,6 +59,7 @@ class EntityStatic(pygame.sprite.Sprite):
             self.animation_action = animation_action
             self.num_frame = 0
             self.image = self.animation[self.animation_action][self.num_frame]
+            print("self.animation[self.animation_action][self.num_frame]", self.animation, [self.animation_action, self.num_frame])
 
     def new_game(self):
         self.change_action(self.start_animation_action)
@@ -97,16 +99,39 @@ class Player(Entity):
         self.score_coff = 1
         self.min_y = -155
         self.world = world
+        self.sur_trace = pygame.Surface((PLAYER_RECT.w * 7, PLAYER_RECT.w * 3)).convert_alpha()
+
+
+
+    def draw(self, screen, xy=None):
+        """Если xy is None, то используется записане в спрайт координаты иначе xy"""
+        if xy is None:
+            xy = self.rect
+
+        if self.flash:
+            self.draw_flash(screen, xy)
+        else:
+            self.draw_player(screen, xy)
+
+    def draw_flash(self, surf, xy):
+        self.sur_trace.scroll()
+
+    def draw_player(self, surf, xy):
+        surf.blit(self.image, xy)
+        print("surf.blit(self.image, xy)")
 
     def new_game(self):
         super().new_game()
         self.moving_right = False
         self.moving_left = False
+        self.movement = (0, 0)
         self.tap_oxygen_jump = False
+        self.fly = False
         self.double_jump = False
         self.air_timer = 0
         self.vertical_momentum = 0
         self.player_flip = 0
+        self.flash = False # остовление тени хвоста за собой
         self.oxygen = self.max_oxygen
         self.score = 0
         self.alive = True
@@ -136,6 +161,7 @@ class Player(Entity):
                     if self.vertical_momentum > -self.oxygen_jump_speed // 2:
                         self.vertical_momentum -= self.oxygen_jump_speed
                         self.oxygen -= self.oxygen_jump_spending
+                        self.fly = True
                     # self.tap_oxygen_jump = True
 
             if event.type == pygame.KEYUP:
@@ -143,8 +169,8 @@ class Player(Entity):
                     self.moving_right = False
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
-                if event.key == pygame.K_SPACE or event.key == pygame.K_w:
-                    self.tap_oxygen_jump = False
+                # if event.key == pygame.K_SPACE or event.key == pygame.K_w:
+                #     self.tap_oxygen_jump = False
         else:
             self.new_tick(**kwargs)
 
@@ -162,15 +188,17 @@ class Player(Entity):
         max_gravity = self.gravity * 15
         if self.vertical_momentum > max_gravity:
             self.vertical_momentum = max_gravity
-
-        if player_movement[0] == 0:
+        if self.fly and self.vertical_momentum < 0:
+            self.change_action('fly')
+        elif player_movement[0] == 0:
             self.change_action('idle')
+        else:
+            self.change_action('run')
         if player_movement[0] > 0:
-            self.change_action('run')
             self.player_flip = False
-        if player_movement[0] < 0:
-            self.change_action('run')
+        elif player_movement[0] < 0:
             self.player_flip = True
+
 
         ox, oy = self.rect.x, self.rect.y
         self.rect, collisions = self.move(self.rect, player_movement, tile_rects)
@@ -179,6 +207,7 @@ class Player(Entity):
             self.air_timer = 0
             self.vertical_momentum = 0
             self.double_jump = False
+            self.fly = False
         else:
             self.air_timer += 1
         if collisions["top"] == True:
@@ -194,7 +223,7 @@ class Player(Entity):
         if self.oxygen < 0:
             self.damage(1)
 
-        self.score = max(self.score, int(self.rect.x * self.score_coff // 100))
+        self.score = max(self.score, int(self.rect.x * self.score_coff / SIZE_COF // 100))
         # print("PlayerRect", (self.rect.x, self.rect.y), (self.rect.x // TILE_SIZE, self.rect.y // TILE_SIZE))
         self.update_image()
         return true_movement
@@ -217,12 +246,14 @@ class Player(Entity):
         self.alive = False
 
     def update_image(self):
-        player_img = self.animation[self.animation_action][self.num_frame]
-        self.image = pygame.transform.flip(player_img, self.player_flip, False)
-        if self.air_timer < 6:
+        if self.air_timer < 6 or self.animation_action == "fly":
             self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
         else:
             self.num_frame = 0
+
+        player_img = self.animation[self.animation_action][self.num_frame]
+        self.image = pygame.transform.flip(player_img, self.player_flip, False)
+
         self.surface_oxygen_bar.fill((50, 50, 100))
         wbord = 2
         w, h = self.surface_oxygen_bar.get_size()
@@ -239,7 +270,7 @@ class Player(Entity):
 
     def move(self, rect, movement, tiles):
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
-
+        ox, oy = self.rect.x, self.rect.y
         rect.x += movement[0]
         hit_list = collision_test(rect, tiles)
         for tile in hit_list:
@@ -263,4 +294,5 @@ class Player(Entity):
             self.rect.y = self.min_y
             self.vertical_momentum = -self.vertical_momentum
             collision_types['top'] = True
+        self.movement = self.rect.x - ox, self.rect.y - oy
         return rect, collision_types

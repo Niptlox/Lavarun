@@ -38,9 +38,12 @@ class Game(Window):
 
     def initGame(self):
         import World
-        self.startMenu = StartMenu(self.size, lambda: self.setPhasa(P_GAMELOOP_EASY),
-                                   lambda: self.setPhasa(P_GAMELOOP_HARD))
-        world = World.World(display_size=self.size)
+        self.startMenu = StartMenu(lambda: self.setPhasa(P_GAMELOOP_EASY),
+                                   lambda: self.setPhasa(P_GAMELOOP_HARD),
+                                   self.full_screen,
+                                   self.quit)
+        # world = World.World(display_size=self.size)
+        world = World.World()
         self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda: self.setPhasa(P_MENUSTART))
         self.frameGame.setPhasa(World.P_GAMELOOPW)
         self.setPhasa(P_MENUSTART)

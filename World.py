@@ -1,5 +1,5 @@
 import pygame
-
+from UI.Window import STATIC_SIZE
 from Texture import *
 from Entities import *
 from Chank import *
@@ -16,7 +16,7 @@ EASY = 1
 class World:
     COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
 
-    def __init__(self, display_size=(720, 480)):
+    def __init__(self, display_size=STATIC_SIZE):
         self.game_map = {}
         # при level < 0  авто генерация, иначе из файла
         self.level = None
@@ -108,7 +108,8 @@ class World:
         return True
 
     def redraw(self):
-        self.display.fill((146, 144, 255))
+        # self.display.fill((146, 144, 255))
+        self.display = vertical_gradient(self.display_size, (146, 144, 255, 250), (46, 44, 155, 250))
         for tile in self.tiles:
             xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE - self.scroll[1])
             type_tile = tile[1]
