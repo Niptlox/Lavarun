@@ -6,10 +6,10 @@ pygame.init()
 # Фазы игры
 # показать меню старта программы
 P_MENUSTART = 1
-# играем в бесконечную игры
+# играем в бесконечную игру
 P_GAMELOOP_EASY = 10
 P_GAMELOOP_NORMAL = 12
-P_GAMELOOP_HARD = 14 
+P_GAMELOOP_HARD = 14
 # выбираем карту
 P_MENUMAPS = 20
 # Играем на уже созданной карте
@@ -48,7 +48,6 @@ class Game(Window):
         self.frameGame.setPhasa(World.P_GAMELOOPW)
         self.setPhase(P_MENUSTART)
         # self.setPhase(P_GAMELOOP)
-
 
 
 if __name__ == '__main__':

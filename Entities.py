@@ -59,7 +59,8 @@ class EntityStatic(pygame.sprite.Sprite):
             self.animation_action = animation_action
             self.num_frame = 0
             self.image = self.animation[self.animation_action][self.num_frame]
-            print("self.animation[self.animation_action][self.num_frame]", self.animation, [self.animation_action, self.num_frame])
+            print("self.animation[self.animation_action][self.num_frame]", self.animation,
+                  [self.animation_action, self.num_frame])
 
     def new_game(self):
         self.change_action(self.start_animation_action)
@@ -101,8 +102,6 @@ class Player(Entity):
         self.world = world
         self.sur_trace = pygame.Surface((PLAYER_RECT.w * 7, PLAYER_RECT.w * 3)).convert_alpha()
 
-
-
     def draw(self, screen, xy=None):
         """Если xy is None, то используется записане в спрайт координаты иначе xy"""
         if xy is None:
@@ -131,7 +130,7 @@ class Player(Entity):
         self.air_timer = 0
         self.vertical_momentum = 0
         self.player_flip = 0
-        self.flash = False # остовление тени хвоста за собой
+        self.flash = False  # остовление тени хвоста за собой
         self.oxygen = self.max_oxygen
         self.score = 0
         self.alive = True
@@ -199,7 +198,6 @@ class Player(Entity):
         elif player_movement[0] < 0:
             self.player_flip = True
 
-
         ox, oy = self.rect.x, self.rect.y
         self.rect, collisions = self.move(self.rect, player_movement, tile_rects)
         true_movement = [self.rect.x - ox, self.rect.y - oy]
@@ -262,7 +260,7 @@ class Player(Entity):
         pygame.draw.rect(self.surface_oxygen_bar, (110, 0, 50), (0, 0, w, h), wbord)
 
         textScore = TEXTFONT.render(str(self.score), False,
-                          (180, 180, 0))
+                                    (180, 180, 0))
         self.surface_score.fill((22, 22, 22))
         self.surface_score.blit(textScore, (2, 0))
         # print("self.oxygen", self.oxygen)

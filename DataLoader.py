@@ -3,6 +3,7 @@ import os.path
 
 DATA_FILE = "data\\save\\data.dat"
 
+
 def checking_file():
     if not os.path.exists(DATA_FILE):
         print("os.path.exists(DATA_FILE)")

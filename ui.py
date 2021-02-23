@@ -17,18 +17,16 @@ class Menu(Frame):
                 but = Button(rect)
 
 
-
-
 class StartMenu(Frame):
     background = get_texture(r"data\sprites\bgStart.png")
 
     def __init__(self, funcStartEasy, funcStartHard, funcFullScreen, funcQuit):
         super().__init__(((0, 0), SIZE), self.background)
         # super().__init__(SIZE, self.background)
-        imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
+        imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png", None)
 
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
-        size_but = (170, 40)
+        size_but = (170, 69)
         step = 60
         bx, by = self.proc_coords((0.08, 0.29))
         self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
@@ -71,33 +69,33 @@ class StartMenu(Frame):
         self.score_update()
 
 
-class StartMenu_old(pygame.sprite.Sprite):
-    background = get_texture(r"data\sprites\bgStart.png")
-
-    def __init__(self, size, funcStart):
-        super().__init__()
-        self.rect = pygame.Rect((0, 0), size)
-        self.image = pygame.Surface(self.rect.size)
-        self.background = StartMenu.background
-        imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
-        self.butStart = Button((100, 120), imgB_up, imgB_in, imgB_down, funcStart, size=(170, 40))
-        self.butStart2 = Button((100, 190), imgB_up, imgB_in, imgB_down, lambda: print("START2"), size=(170, 40))
-        self.labelScore = Label(((100, 80), (170, 30)), bg=BLACK, text=f"RECORD: {get_max_score()}")
-        self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2))
-
-    def update(self, *args):
-        if args:
-            event = args[0]
-            self.groupBts.update(event)
-
-    def draw(self, screen):
-        if self.background.get_size != self.rect.size:
-            self.background = pygame.transform.scale(StartMenu.background, self.rect.size)
-
-        self.image.blit(self.background, (0, 0))
-        self.groupBts.draw(self.image)
-        self.labelScore.draw(self.image)
-        screen.blit(self.image, self.rect)
+# class StartMenu_old(pygame.sprite.Sprite):
+#     background = get_texture(r"data\sprites\bgStart.png")
+#
+#     def __init__(self, size, funcStart):
+#         super().__init__()
+#         self.rect = pygame.Rect((0, 0), size)
+#         self.image = pygame.Surface(self.rect.size)
+#         self.background = StartMenu.background
+#         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png")
+#         self.butStart = Button((100, 120), imgB_up, imgB_in, imgB_down, funcStart, size=(170, 40))
+#         self.butStart2 = Button((100, 190), imgB_up, imgB_in, imgB_down, lambda: print("START2"), size=(170, 40))
+#         self.labelScore = Label(((100, 80), (170, 30)), bg=BLACK, text=f"RECORD: {get_max_score()}")
+#         self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2))
+#
+#     def update(self, *args):
+#         if args:
+#             event = args[0]
+#             self.groupBts.update(event)
+#
+#     def draw(self, screen):
+#         if self.background.get_size != self.rect.size:
+#             self.background = pygame.transform.scale(StartMenu.background, self.rect.size)
+#
+#         self.image.blit(self.background, (0, 0))
+#         self.groupBts.draw(self.image)
+#         self.labelScore.draw(self.image)
+#         screen.blit(self.image, self.rect)
 
 
 def main():

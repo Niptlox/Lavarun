@@ -208,8 +208,8 @@ class GameFrame(Frame):
                                           lambda: self.restart(),
                                           lambda: self.quit())
         self.frame_finish_menu = GameFinish(self.proc_size((0.3, 0.5)), self.rect,
-                                          lambda: self.restart(),
-                                          lambda: self.quit())
+                                            lambda: self.restart(),
+                                            lambda: self.quit())
 
     def setPhasa(self, phasa):
         self.phasa = phasa
@@ -285,7 +285,6 @@ class GamePause(Frame):
             super().update(*args)
 
 
-
 class GameFinish(Frame):
     def __init__(self, size, window_rect, func_restart, func_menu):
         bg = get_texture_size(WHITE, size=size)
@@ -296,7 +295,7 @@ class GameFinish(Frame):
         xy = [(self.rect.w - frame_size[0]) // 2, step]
         # self.add_frame(Label((xy, frame_size), text="Score:", bg=WHITE, text_color=BLACK))
         # xy[1] += frame_size[1]
-        self.frame_score = Label((xy, (frame_size[0], 35)), text="0")#, bg=WHITE, text_color=BLACK)
+        self.frame_score = Label((xy, (frame_size[0], 35)), text="0")  # , bg=WHITE, text_color=BLACK)
         self.add_frame(self.frame_score)
         xy[1] += frame_size[1] + step
         but_surf_restart = createImageButton(frame_size, "Restart"), createImageButton(frame_size, "Restart", bg=GRAY)
@@ -307,4 +306,4 @@ class GameFinish(Frame):
         self.add_frames(buts)
 
     def set_score(self, score):
-        self.frame_score.setText("Score: "+ str(score))
+        self.frame_score.setText("Score: " + str(score))

@@ -1,9 +1,6 @@
 from UI.Button import *
 
 
-
-
-
 def main():
     size = (1200, 700)
     screen = pygame.display.set_mode(size)

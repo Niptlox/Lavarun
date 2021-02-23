@@ -1,5 +1,6 @@
 from Texture import *
-from UI.Window import  SIZE_COF
+from UI.Window import SIZE_COF
+
 # статстический размер кубика
 STATIC_TILE_SIZE = 32
 # реальный размер кубика

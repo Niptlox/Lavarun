@@ -9,8 +9,6 @@ class Frame(pygame.sprite.Sprite):
     # image_boom = load_image("boom.png")
 
     def __init__(self, rect, bg=None, groups=[]):
-        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
-        # Это очень важно !!!
         super().__init__(*groups)
 
         self.rect = pygame.Rect(rect)
@@ -104,12 +102,12 @@ class Frame(pygame.sprite.Sprite):
         y = int(y * self.rect.h / sh)
         return x, y
 
-    # Перещёт координат из прцентов
+    # Пересчёт координат из процентов
     def proc_coords(self, proc_xy):
         x, y = self.rect.w * proc_xy[0], self.rect.h * proc_xy[1]
         return x, y
 
-    # Перещёт размера из прцентов
+    # Пересчёт размера из процентов
     def proc_size(self, proc_size):
         w, h = self.rect.w * proc_size[0], self.rect.h * proc_size[1]
         return w, h
