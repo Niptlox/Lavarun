@@ -26,20 +26,20 @@ class StartMenu(Frame):
         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png", None)
 
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
-        size_but = (170, 69)
+        size_but = (imgB_up.get_width() // 5, imgB_up.get_height() // 5)
         step = 60
         bx, by = self.proc_coords((0.08, 0.29))
         self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
-        by += step
+        by += step * 2
         self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
-        by += step
+        by += step * 2
         # self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
         # by += step
         # xy_labelScore = self.convert_func_coords((300, 120), STATIC_SIZE)
 
         but_surf_full = createImagesButton(size_but, "FullScreen")
         self.butFullS = Button(((bx, by), size_but), *but_surf_full, func=funcFullScreen)
-        by += step
+        by += step * 2
         but_surf_quit = createImagesButton(size_but, "Exit")
         self.butQuit = Button(((bx, by), size_but), *but_surf_quit, func=funcQuit)
 

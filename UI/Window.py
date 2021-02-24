@@ -4,7 +4,7 @@ import  os
 
 # os.environ['SDL_VIDEO_CENTERED'] = '0'
 
-STATIC_SIZE = (800, 500)
+STATIC_SIZE = (1600, 1000)
 
 SIZE = STATIC_SIZE
 # SIZE = (700, 400)

@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 from Tiles import *
 
 LEVEL_AUTO = -1
@@ -35,6 +35,11 @@ def load_pattern(name, typep=TYPE_TXT):
 START_PATTERN = load_pattern("Start")
 START_PATTERN_1 = load_pattern("Start-1")
 PLAT_PATTERN = load_pattern("Plat")  # металлическая платформа...
+LAVA_PATTERN = load_pattern("Lava")
+RANDOM_PATTERN_NAMES = ["r1", "r2", "r3", "r4", "r5"]
+RANDOM_PATTERNS = []
+for i in RANDOM_PATTERN_NAMES:
+    RANDOM_PATTERNS.append(load_pattern(i))
 print("PLAT_PATTERN", PLAT_PATTERN)
 
 
@@ -61,8 +66,10 @@ def auto_generation(xy):
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     if x == 0 and y == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN)
-    elif x == -1 and y == 0:
-        chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN_1)
+    # elif x == -1 and y == 0:
+    #     chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN_1)
+    elif x < 0 and y == 0:
+        chunk_data = get_chunk_of_pattern(tile_xy, LAVA_PATTERN)
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:
@@ -105,32 +112,4 @@ def random_chunk(xy):  # генерация случайного чанка
 
 
 def pattern_generation(xy):
-    x, y = xy
-    chunk_data = []
-    i = 0
-    m_a_g = [None] * CHUNK_SIZE
-    old_tile_type = None
-    for y_pos in range(CHUNK_SIZE - 1, -1, -1):
-        m_a_g_old = m_a_g
-        m_a_g = [None] * CHUNK_SIZE
-        for x_pos in range(CHUNK_SIZE):
-            target_x = x * CHUNK_SIZE + x_pos
-            target_y = y * CHUNK_SIZE + y_pos
-            tile_type = 0  # nothing
-            if target_y == 6 and randint(0, 2) == 1:
-                tile_type = N_DIRT
-            elif target_y == 3 and randint(0, 3) == 1:
-                tile_type = N_DIRT
-            elif target_y == 9 and (randint(0, 5) == 1 or old_tile_type == N_LAVA and randint(0, 10) == 1):
-                tile_type = N_LAVA
-            elif target_y > 8:
-                tile_type = N_DIRT  # dirt
-            elif m_a_g_old[x_pos] == N_DIRT and randint(0, 5) == 1:
-                tile_type = N_SPIKE
-            if tile_type != 0:
-                chunk_data.append([[target_x, target_y], tile_type])
-            m_a_g[x_pos] = tile_type
-            old_tile_type = tile_type
-            i += 1
-
-    return chunk_data
+    return choice(RANDOM_PATTERNS)

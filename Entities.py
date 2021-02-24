@@ -85,7 +85,7 @@ class Player(Entity):
         rect = PLAYER_RECT.move(*xy)  # is copy rect
         super().__init__(rect, player_frames, "idle")
         self.jump_speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость при старте прыжка
-        self.speed = 7 / STATIC_TILE_SIZE * TILE_SIZE  # скорость хождения
+        self.speed = 9 / STATIC_TILE_SIZE * TILE_SIZE  # скорость хождения
         self.gravity = 0.4 / STATIC_TILE_SIZE * TILE_SIZE  # скорость падения
         self.alive = True
         self.max_oxygen = 5000
@@ -123,6 +123,7 @@ class Player(Entity):
         super().new_game()
         self.moving_right = False
         self.moving_left = False
+        self.moving_down = False
         self.movement = (0, 0)
         self.tap_oxygen_jump = False
         self.fly = False
@@ -145,7 +146,6 @@ class Player(Entity):
                     self.moving_right = True
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = True
-                    pass
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
                     # прыжок от земли
                     if self.air_timer < 6:
@@ -153,7 +153,8 @@ class Player(Entity):
                     # elif not self.double_jump:
                     #     self.vertical_momentum = -self.jump_speed
                     #     self.double_jump = True
-
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    self.moving_down = True
                 if event.key == pygame.K_SPACE:
                     # прыжок на кислороде
                     print("self.vertical_momentum", self.vertical_momentum)
@@ -168,6 +169,8 @@ class Player(Entity):
                     self.moving_right = False
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.moving_left = False
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    self.moving_down = False
                 # if event.key == pygame.K_SPACE or event.key == pygame.K_w:
                 #     self.tap_oxygen_jump = False
         else:
@@ -178,10 +181,12 @@ class Player(Entity):
         #     self.vertical_momentum -= self.oxygen_jump_speed
         #     self.oxygen -= self.oxygen_jump_spending
         player_movement = [0, 0]
-        if self.moving_right == True:
+        if self.moving_right:
             player_movement[0] += self.speed
-        if self.moving_left == True:
+        if self.moving_left:
             player_movement[0] -= self.speed
+        if self.moving_down:
+            self.vertical_momentum += self.gravity * 5
         player_movement[1] += self.vertical_momentum
         self.vertical_momentum += self.gravity
         max_gravity = self.gravity * 15

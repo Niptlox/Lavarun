@@ -19,7 +19,7 @@ class World:
     def __init__(self, display_size=STATIC_SIZE):
         self.game_map = {}
         # при level < 0  авто генерация, иначе из файла
-        self.level = None
+        self.level = -1
         self.difficulty = None
         self.display_size = display_size
         self.display = pygame.Surface(display_size)
@@ -38,6 +38,7 @@ class World:
     def get_chunk(self, xy):
         if xy not in self.game_map:
             if self.level < 0:
+                print(str(self.level) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 self.game_map[xy] = self.generation_chunk(xy, self.level)
             else:
                 return

@@ -4,7 +4,7 @@ from UI.Window import SIZE_COF
 # статстический размер кубика
 STATIC_TILE_SIZE = 32
 # реальный размер кубика
-TILE_SIZE = 40
+TILE_SIZE = 60
 TILE_SIZE = int(TILE_SIZE * SIZE_COF)
 TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 
