@@ -8,9 +8,9 @@ colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 s = 4
 
 player_frames = {
-    "run": load_animation(path_player + r"run\jonny_walk", [s, s, s, s], size=PLAYER_RECT.size),
-    "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=colorkeyI),
-    "fly": load_animation(path_player + r"fly_idle\fly_idle", [3, 3], size=PLAYER_RECT.size, colorkey=colorkeyI)
+    "run": load_animation(path_player + r"run\jonny_walk", [s, s, s, s], size=PLAYER_RECT.size, colorkey=None),
+    "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=None),
+    "fly": load_animation(path_player + r"fly_idle\fly_idle", [3, 3], size=PLAYER_RECT.size, colorkey=None)
 }
 
 

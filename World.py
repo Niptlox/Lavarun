@@ -38,7 +38,6 @@ class World:
     def get_chunk(self, xy):
         if xy not in self.game_map:
             if self.level < 0:
-                print(str(self.level) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 self.game_map[xy] = self.generation_chunk(xy, self.level)
             else:
                 return
@@ -110,7 +109,8 @@ class World:
 
     def redraw(self):
         # self.display.fill((146, 144, 255))
-        self.display = vertical_gradient(self.display_size, (146, 144, 255, 250), (46, 44, 155, 250))
+        self.display = vertical_gradient(self.display_size, (5, 22, 29, 250), (5, 28, 37, 250))
+        # self.display = pygame.transform.scale(load_image('data/sprites/gamebg.png'), self.display_size)
         for tile in self.tiles:
             xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE - self.scroll[1])
             type_tile = tile[1]

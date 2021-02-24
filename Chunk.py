@@ -90,17 +90,19 @@ def random_chunk(xy):  # генерация случайного чанка
             target_x = x * CHUNK_SIZE + x_pos
             target_y = y * CHUNK_SIZE + y_pos
             tile_type = 0  # nothing
-            if target_y == 6 and randint(0, 5) == 1:
+            if target_y == 0 and randint(0, 2) == 1:
                 tile_type = N_DIRT
-            elif target_y == 3 and randint(0, 6) == 1:
+            if target_y == 6 and randint(0, 3) == 1:
                 tile_type = N_DIRT
-            elif target_y == 9 and (randint(0, 5) == 1 or old_tile_type == N_LAVA and randint(0, 10) == 1):
+            elif target_y == 3 and randint(0, 3) == 1:
+                tile_type = N_DIRT
+            elif target_y == 9 and (randint(0, 5) == 1 or old_tile_type == N_LAVA and randint(0, 5) == 1):
                 tile_type = N_LAVA
             elif target_y == 9:
                 tile_type = N_DIRT
             elif target_y > 9:
                 tile_type = N_DIRTDOWN  # dirt
-            elif m_a_g_old[x_pos] == N_DIRT and randint(0, 5) == 1:
+            elif m_a_g_old[x_pos] == N_DIRT and randint(0, 3) == 1:
                 tile_type = N_SPIKE
             if tile_type != 0:
                 chunk_data.append([[target_x, target_y], tile_type])
