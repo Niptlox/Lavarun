@@ -103,9 +103,10 @@ class World:
         self.tile_rects, self.tiles, self.entitys = self.update_display(scroll, self.display_size)
         # Обновление игрока, движение и тд
         self.player.update(tile_rects=self.tile_rects, entitys=self.entitys)
-        if not self.player.alive:
+        if not self.player.alive or self.player.win is not None:
             self.save_data()
             return False
+
         return True
 
     def redraw(self):
@@ -192,6 +193,7 @@ class World:
 P_GAMELOOPW = 1
 P_GAMEPAUSEW = 2
 P_GAMEFINISHW = 3
+P_GAMESPACESHIPW = 4
 
 
 class GameFrame(Frame):
@@ -209,6 +211,10 @@ class GameFrame(Frame):
                                           lambda: self.setPhasa(P_GAMELOOPW),
                                           lambda: self.restart(),
                                           lambda: self.quit())
+        self.frame_spaceship_menu = GameSpaceship(self.proc_size((0.3, 0.5)), self.rect,
+                                          lambda: self.setPhasa(P_GAMELOOPW),
+                                          lambda: self.restart(),
+                                          lambda: self.quit())
         self.frame_finish_menu = GameFinish(self.proc_size((0.3, 0.5)), self.rect,
                                             lambda: self.restart(),
                                             lambda: self.quit())
@@ -223,6 +229,10 @@ class GameFrame(Frame):
         if self.phasa == P_GAMEFINISHW:
             self.scene = self.frame_finish_menu
             self.frame_finish_menu.set_score(self.world.get_score())
+        if self.phasa == P_GAMESPACESHIPW:
+            self.scene = self.frame_spaceship_menu
+            self.frame_spaceship_menu.set_score(self.world.get_score())
+            self.world.player.set_win(None)
 
     def update(self, *args):
         if args:
@@ -236,9 +246,12 @@ class GameFrame(Frame):
 
     def redraw(self):
         if self.phasa == P_GAMELOOPW:
-            live = self.world.update()
-            if not live:
-                self.setPhasa(P_GAMEFINISHW)
+            running = self.world.update()
+            if not running:
+                if not self.world.player.alive:
+                    self.setPhasa(P_GAMEFINISHW)
+                elif self.world.player.win:
+                    self.setPhasa(P_GAMESPACESHIPW)
         self.scene.draw(self.image)
         if not self.running:
             self.to_main_menu()
@@ -276,6 +289,47 @@ class GamePause(Frame):
                                    [but_surf_back, but_surf_restart, but_surf_menu],
                                    [func_back, func_restart, func_menu])
         self.add_frames(buts)
+
+    def update(self, *args):
+        if args:
+            event = args[0]
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                # print("event", event)
+                pass
+                self.func_back()
+            super().update(*args)
+
+
+
+class GameSpaceship(Frame):
+    def __init__(self, size, window_rect, func_back, func_restart, func_menu):
+        bg = get_texture_size(WHITE, size=size)
+        super().__init__(pygame.Rect((0, 0), size), bg=bg)
+        self.set_pos_center(window_rect)
+        self.func_back = func_back
+        frame_size = self.proc_size((0.6, 0.2))
+        xy = [self.rect.w // 2 - frame_size[0] // 2, 20]
+
+        but_size = self.proc_size((0.6, 0.1))
+        frame_t = Label((xy, (frame_size[0], 35)), text="YOU WIN")  # , bg=WHITE, text_color=BLACK)
+        self.add_frame(frame_t)
+        xy[1] += frame_size[1] + 5
+        self.frame_score = Label((xy, (frame_size[0], 35)), text="0")  # , bg=WHITE, text_color=BLACK)
+        self.add_frame(self.frame_score)
+        xy[1] += frame_size[1] + 5
+        xy[0] += frame_size[0] // 2
+        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY, font=TEXTFONT_BTN)
+        but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY, font=TEXTFONT_BTN)
+        but_surf_menu = createImageButton(but_size, "Menu"), createImageButton(but_size, "Menu", bg=GRAY, font=TEXTFONT_BTN)
+        buts = createVSteckButtons(but_size, xy[0], xy[1], 20,
+                                   [but_surf_back, but_surf_restart, but_surf_menu],
+                                   [func_back, func_restart, func_menu])
+        self.add_frames(buts)
+
+
+    def set_score(self, score):
+        self.frame_score.setText("Score: " + str(score))
+
 
     def update(self, *args):
         if args:

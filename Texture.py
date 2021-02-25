@@ -67,6 +67,7 @@ def get_texture_size(texture, size=None, colorkey=None):
         image = load_image(texture, colorkey)
         if size is not None:
             image = pygame.transform.scale(image, size)
+            # image = image.convert_alpha()
         return image
     if isColor(texture) and size is not None:
         surf = pygame.Surface(size)
@@ -91,7 +92,7 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
     # else:
-    #     image = image.convert_alpha()
+    #   image = image.convert_alpha()
     return image
 
 

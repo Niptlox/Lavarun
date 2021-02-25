@@ -36,6 +36,7 @@ def load_pattern(name, typep=TYPE_TXT):
 
 
 START_PATTERN = load_pattern("Start")
+FINISH_PATTERN = load_pattern("Finish")
 START_PATTERN_1 = load_pattern("Start-1")
 PLAT_PATTERN = load_pattern("Plat")  # металлическая платформа...
 LAVA_PATTERN = load_pattern("Lava")
@@ -45,7 +46,7 @@ RANDOM_PATTERNS = []
 for i in RANDOM_PATTERN_NAMES:
     RANDOM_PATTERNS.append(load_pattern(i))
 OLD_PATTERN = 0
-patternGenOrder = [[1, 4], [2], [3], [4], [5], [1]]  # Определяет порядок в котором генерируются паттерны
+patternGenOrder = [[1], [2, 5, 1], [4], [4, 3], [5, 2, 1], [1, 2, 3]]  # Определяет порядок в котором генерируются паттерны
 # Первый подмассив, это те паттерны, которые могут появиться после чанка спавна,
 # 2 подмассив, это те паттерны, которые могут появиться после чанка с номером 2 и т.д.
 # Сами паттерны берутся из RANDOM_PATTERN_NAMES(отсчет идет с единицы(0 обозначает чанк спавна))
@@ -126,6 +127,7 @@ def pattern_generation(xy):
     global OLD_PATTERN
     x, y = xy
     if y == 0 and x == 0:
+        print('1')
         OLD_PATTERN = 0
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     chunk_data = []
@@ -145,6 +147,8 @@ def pattern_generation(xy):
         chunk_data = get_chunk_of_pattern(tile_xy, EASTER_EGG_PATTERN)
     elif x < 0 and y == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, LAVA_PATTERN)
+    elif x == 10 and y == 0:
+        chunk_data = get_chunk_of_pattern(tile_xy, FINISH_PATTERN)
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:

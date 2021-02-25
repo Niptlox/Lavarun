@@ -9,6 +9,7 @@ TILE_SIZE = int(TILE_SIZE * SIZE_COF)
 TILE_SIZEL = (TILE_SIZE, TILE_SIZE)
 
 N_OXYGEN = -101
+N_PULT = -102
 OXYGEN_COUNT = 500
 
 N_DIRT = 1
@@ -25,14 +26,16 @@ tiles_frames = {
     N_METAL: get_texture_size(path_tile + "metal.png", size=TILE_SIZEL),
     N_METAL_BG: get_texture_size(path_tile + "metal_bg.png", size=TILE_SIZEL),
     N_NONE: get_texture_size(path_tile + "none.png", size=TILE_SIZEL),
-    N_SPIKE: get_texture_size(path_tile + "spike.png", size=TILE_SIZEL, colorkey=None),
+    N_SPIKE: get_texture_size(path_tile + "spike.png", size=TILE_SIZEL, colorkey=COLORKEY),
     N_LAVA: get_texture_size(path_tile + "lava.png", size=TILE_SIZEL, colorkey=COLORKEY),
     N_OXYGEN: get_texture_size(path_tile + "oxygen.png", size=TILE_SIZEL, colorkey=None),
+    N_PULT: get_texture_size(path_tile + "pult.png", size=TILE_SIZEL, colorkey=None),
     N_DIRTDOWN: get_texture_size(path_tile + "dirt.png", size=TILE_SIZEL, colorkey=COLORKEY)
 }
 
 tiles_chars = {
     "_": N_DIRT,
+    "@": N_PULT,
     "#": N_DIRTDOWN,
     "w": N_SPIKE,
     "+": N_LAVA,

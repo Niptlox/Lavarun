@@ -7,6 +7,8 @@ path_player = r"data\sprites\player\\"
 colorkeyI = load_image(path_player + r"idle\idle_0.png").get_at((0, 0))
 s = 4
 
+WIN_SPACESHIP = 1
+
 player_frames = {
     "run": load_animation(path_player + r"run\jonny_walk", [s, s, s, s], size=PLAYER_RECT.size, colorkey=None),
     "idle": load_animation(path_player + r"idle\idle", [20, 5], size=PLAYER_RECT.size, colorkey=None),
@@ -98,10 +100,11 @@ class Player(Entity):
         self.score = 0
         # коофицент умножения score
         self.score_coff = 1
-        self.min_y = -155
+        self.min_y = -TILE_SIZE * 8
         # self.min_x = -200
         self.world = world
         self.sur_trace = pygame.Surface((PLAYER_RECT.w * 7, PLAYER_RECT.w * 3)).convert_alpha()
+        self.win = None
 
     def draw(self, screen, xy=None):
         """Если xy is None, то используется записане в спрайт координаты иначе xy"""
@@ -136,6 +139,7 @@ class Player(Entity):
         self.oxygen = self.max_oxygen
         self.score = 0
         self.alive = True
+        self.win = None
 
     # проверека событий pygame
     def update(self, *args, **kwargs):
@@ -218,12 +222,18 @@ class Player(Entity):
             self.vertical_momentum = 0
         self.oxygen -= self.oxygen_normal_spending
 
+        # ENITIES
         hit_list = collision_test_entitys(self.rect, entitys)
         for entity in hit_list:
             if entity[1] in (N_SPIKE, N_LAVA):
                 self.damage(1)
             elif entity[1] == N_OXYGEN:
                 self.take_oxygen_bulloon(entity)
+            elif entity[1] == N_PULT:
+                self.set_win(WIN_SPACESHIP)
+                self.replace_obj(entity)
+                self.moving_right = False
+                self.moving_left = False
         if self.oxygen < 0:
             self.damage(1)
 
@@ -245,6 +255,9 @@ class Player(Entity):
         r = entity[0]  # rect
         i = entity[2]
         self.world.replace_obj(N_METAL_BG, (r.x, r.y), i)
+
+    def set_win(self, n_win):
+        self.win = n_win
 
     def damage(self, hp_damage=1):
         self.alive = False
