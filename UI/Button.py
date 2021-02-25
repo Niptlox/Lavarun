@@ -12,7 +12,7 @@ def openImagesButton(nameImg: str, colorkey=COLORKEY):
     return imgUp, imgIn, imgDown
 
 
-def createImageButton(size, text="", bg=BLACK, font=TEXTFONT, text_color=WHITE, colorkey=COLORKEY):
+def createImageButton(size, text="", bg=BLACK, font=TEXTFONT_BTN, text_color=WHITE, colorkey=COLORKEY):
     surf = get_texture_size(bg, size, colorkey=colorkey)
 
     texframe = font.render(text, False, text_color)
@@ -23,8 +23,8 @@ def createImageButton(size, text="", bg=BLACK, font=TEXTFONT, text_color=WHITE, 
     return surf
 
 
-def createImagesButton(size, text="", color_schema=DEF_COLOR_SCHEME_BUT, font=TEXTFONT, colorkey=COLORKEY):
-    print("color_schema", [(bg, colort) for bg, colort in zip(color_schema[0], color_schema[1])])
+def createImagesButton(size, text="", color_schema=DEF_COLOR_SCHEME_BUT, font=TEXTFONT_BTN, colorkey=COLORKEY):
+    # print("color_schema", [(bg, colort) for bg, colort in zip(color_schema[0], color_schema[1])])
     imgs_but = [createImageButton(size, text, bg, font=font, text_color=colort, colorkey=colorkey)
                 for bg, colort in zip(color_schema[0], color_schema[1])]
     return imgs_but

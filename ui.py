@@ -20,7 +20,7 @@ class Menu(Frame):
 class StartMenu(Frame):
     background = get_texture(r"data\sprites\bgStart.png")
 
-    def __init__(self, funcStartEasy, funcStartHard, funcFullScreen, funcQuit):
+    def __init__(self, funcStartEasy, funcStartHard, funcStartRandom, funcFullScreen, funcQuit):
         super().__init__(((0, 0), SIZE), self.background)
         # super().__init__(SIZE, self.background)
         imgB_up, imgB_in, imgB_down = openImagesButton(r"data\sprites\buttons\StartBut.png", None)
@@ -31,23 +31,26 @@ class StartMenu(Frame):
         step = 60
         bx, by = self.proc_coords((0.08, 0.22))
         self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
-        by += step * 3
+        by += step * 2
         self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
-        by += step * 3
+        by += step * 2
         # self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
         # by += step
         # xy_labelScore = self.convert_func_coords((300, 120), STATIC_SIZE)
         color_schema = ((BLACK, BLACK, BLACK), (WHITE, GRAY, GRAY))
+        but_surf_random = createImagesButton(size_but, "Random Game", color_schema=color_schema)
+        self.butSurfRandom = Button(((bx, by), size_butdiv2), *but_surf_random, func=funcStartRandom)
+        by += step * 2
         but_surf_full = createImagesButton(size_but, "FullScreen", color_schema=color_schema)
         self.butFullS = Button(((bx, by), size_butdiv2), *but_surf_full, func=funcFullScreen)
-        by += step * 4
+        by += step * 2
         but_surf_quit = createImagesButton(size_but, "Exit", color_schema=color_schema)
         self.butQuit = Button(((bx, by), size_butdiv2), *but_surf_quit, func=funcQuit)
 
         xy_labelScore = self.proc_coords((0.78, 0.12))
         self.labelScore = Label((xy_labelScore, (170, 30)), bg=BLACK)
         self.score_update()
-        self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2, self.butFullS, self.butQuit))
+        self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2, self.butSurfRandom, self.butFullS, self.butQuit))
 
     def update(self, *args):
         if args:

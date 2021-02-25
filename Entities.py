@@ -99,6 +99,7 @@ class Player(Entity):
         # коофицент умножения score
         self.score_coff = 1
         self.min_y = -155
+        # self.min_x = -200
         self.world = world
         self.sur_trace = pygame.Surface((PLAYER_RECT.w * 7, PLAYER_RECT.w * 3)).convert_alpha()
 
@@ -297,5 +298,7 @@ class Player(Entity):
             self.rect.y = self.min_y
             self.vertical_momentum = -self.vertical_momentum
             collision_types['top'] = True
+        # if self.rect.x < self.min_x:
+        #     self.rect.x = self.min_x
         self.movement = self.rect.x - ox, self.rect.y - oy
         return rect, collision_types

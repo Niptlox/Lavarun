@@ -23,6 +23,7 @@ class World:
         self.difficulty = None
         self.display_size = display_size
         self.display = pygame.Surface(display_size)
+        self.GAME_BACKGROUND = pygame.transform.scale(load_image('data/sprites/gamebg.png'), self.display_size)
 
         ss = CHUNK_SIZE * TILE_SIZE
         self.display_chanks_size = (ceil((display_size[0]) / ss + 2), ceil((display_size[1]) / ss + 2))
@@ -109,8 +110,8 @@ class World:
 
     def redraw(self):
         # self.display.fill((146, 144, 255))
-        self.display = vertical_gradient(self.display_size, (5, 22, 29, 250), (5, 28, 37, 250))
-        # self.display = pygame.transform.scale(load_image('data/sprites/gamebg.png'), self.display_size)
+        self.display = vertical_gradient(self.display_size, (0, 0, 0, 250), (5, 5, 37, 200))
+        # self.display = self.GAME_BACKGROUND.copy()
         for tile in self.tiles:
             xy_tile = (tile[0][0] * TILE_SIZE - self.scroll[0], tile[0][1] * TILE_SIZE - self.scroll[1])
             type_tile = tile[1]

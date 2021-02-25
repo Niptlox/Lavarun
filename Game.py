@@ -10,6 +10,7 @@ P_MENUSTART = 1
 P_GAMELOOP_EASY = 10
 P_GAMELOOP_NORMAL = 12
 P_GAMELOOP_HARD = 14
+P_GAMELOOP_RANDOM = 5
 # выбираем карту
 P_MENUMAPS = 20
 # Играем на уже созданной карте
@@ -31,7 +32,11 @@ class Game(Window):
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
         elif self.phasa == P_GAMELOOP_HARD:
-            self.frameGame.newGame(-1, diff=World.HARD)
+            self.frameGame.newGame(-2, diff=World.HARD)
+            self.frameGame.world.clear_map()
+            self.scene = self.frameGame
+        elif self.phasa == P_GAMELOOP_RANDOM:
+            self.frameGame.newGame(-1, diff=World.NORMAL)
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
         self.newScene()
@@ -40,6 +45,7 @@ class Game(Window):
         import World
         self.startMenu = StartMenu(lambda: self.setPhase(P_GAMELOOP_EASY),
                                    lambda: self.setPhase(P_GAMELOOP_HARD),
+                                   lambda: self.setPhase(P_GAMELOOP_RANDOM),
                                    self.full_screen,
                                    self.quit)
         # world = World.World(display_size=self.size)
