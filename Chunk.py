@@ -126,9 +126,6 @@ def random_chunk(xy):  # генерация случайного чанка
 def pattern_generation(xy):
     global OLD_PATTERN
     x, y = xy
-    if y == 0 and x == 0:
-        print('1')
-        OLD_PATTERN = 0
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     chunk_data = []
     if y >= 1:
@@ -140,8 +137,9 @@ def pattern_generation(xy):
     if y != 0:
         return EMPTY_CHUNK
     # print(OLD_PATTERN)
-    OLD_PATTERN = choice(patternGenOrder[OLD_PATTERN])
+    print(str(xy) + ":" + str(patternGenOrder[OLD_PATTERN]))
     if x == 0 and y == 0:
+        OLD_PATTERN = 0
         chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN)
     elif x == -10 and y == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, EASTER_EGG_PATTERN)
@@ -152,5 +150,6 @@ def pattern_generation(xy):
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:
+        OLD_PATTERN = choice(patternGenOrder[OLD_PATTERN])
         chunk_data = get_chunk_of_pattern(tile_xy, RANDOM_PATTERNS[OLD_PATTERN - 1])
     return chunk_data
