@@ -49,7 +49,7 @@ class EntityStatic(pygame.sprite.Sprite):
     def new_tick(self, timeTick=None):
         self.image = self.animation[self.animation_action][self.num_frame]
         self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
-        print("num_frame", self.num_frame)
+        # print("num_frame", self.num_frame)
 
     def get_display_xy(self, scroll):
         return self.rect.x - scroll[0], self.rect.y - scroll[1]
@@ -59,8 +59,8 @@ class EntityStatic(pygame.sprite.Sprite):
             self.animation_action = animation_action
             self.num_frame = 0
             self.image = self.animation[self.animation_action][self.num_frame]
-            print("self.animation[self.animation_action][self.num_frame]", self.animation,
-                  [self.animation_action, self.num_frame])
+            # print("self.animation[self.animation_action][self.num_frame]", self.animation,
+            #       [self.animation_action, self.num_frame])
 
     def new_game(self):
         self.change_action(self.start_animation_action)
@@ -117,7 +117,7 @@ class Player(Entity):
 
     def draw_player(self, surf, xy):
         surf.blit(self.image, xy)
-        print("surf.blit(self.image, xy)")
+        # print("surf.blit(self.image, xy)")
 
     def new_game(self):
         super().new_game()
@@ -157,7 +157,7 @@ class Player(Entity):
                     self.moving_down = True
                 if event.key == pygame.K_SPACE:
                     # прыжок на кислороде
-                    print("self.vertical_momentum", self.vertical_momentum)
+                    # print("self.vertical_momentum", self.vertical_momentum)
                     if self.vertical_momentum > -self.oxygen_jump_speed // 2:
                         self.vertical_momentum -= self.oxygen_jump_speed
                         self.oxygen -= self.oxygen_jump_spending

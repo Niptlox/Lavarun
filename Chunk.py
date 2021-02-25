@@ -7,6 +7,8 @@ LEVEL_PATTERN = -2
 CHUNK_SIZE = 16
 CHUNK_SIZE_DIS = CHUNK_SIZE * TILE_SIZE
 
+EMPTY_CHUNK = [] * CHUNK_SIZE
+
 TYPE_TXT = ".pat"
 PATTERNS_PATH = "data\\patterns\\"
 
@@ -40,6 +42,11 @@ RANDOM_PATTERN_NAMES = ["r1", "r2", "r3", "r4", "r5"]
 RANDOM_PATTERNS = []
 for i in RANDOM_PATTERN_NAMES:
     RANDOM_PATTERNS.append(load_pattern(i))
+OLD_PATTERN = 0
+patternGenOrder = [[1, 2], [3, 4], [2, 4, 5], [1, 2, 3], [4], [1]]  # Определяет порядок в котором генерируются паттерны
+# Первый подмассив, это те паттерны, которые могут появиться после чанка спавна,
+# 2 подмассив, это те паттерны, которые могут появиться после чанка с номером 2 и т.д.
+# Сами паттерны берутся из RANDOM_PATTERN_NAMES(отсчет идет с единицы(0 обозначает чанк спавна))
 print("PLAT_PATTERN", PLAT_PATTERN)
 
 
@@ -61,7 +68,7 @@ def get_chunk_of_pattern(xy, pattern):
 
 def auto_generation(xy):
     x, y = xy
-    print("auto_generation", xy)
+    # print("auto_generation", xy)
     chunk_data = []
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     if x == 0 and y == 0:
@@ -90,9 +97,9 @@ def random_chunk(xy):  # генерация случайного чанка
             target_x = x * CHUNK_SIZE + x_pos
             target_y = y * CHUNK_SIZE + y_pos
             tile_type = 0  # nothing
-            if target_y == 0 and randint(0, 2) == 1:
+            if target_y == 0 and randint(0, 3) == 1:
                 tile_type = N_DIRT
-            if target_y == 6 and randint(0, 3) == 1:
+            if target_y == 6 and randint(0, 4) == 1:
                 tile_type = N_DIRT
             elif target_y == 3 and randint(0, 3) == 1:
                 tile_type = N_DIRT
@@ -102,16 +109,39 @@ def random_chunk(xy):  # генерация случайного чанка
                 tile_type = N_DIRT
             elif target_y > 9:
                 tile_type = N_DIRTDOWN  # dirt
-            elif m_a_g_old[x_pos] == N_DIRT and randint(0, 3) == 1:
+            if m_a_g_old[x_pos] == N_DIRT and randint(0, 3) == 1:
                 tile_type = N_SPIKE
             if tile_type != 0:
                 chunk_data.append([[target_x, target_y], tile_type])
             m_a_g[x_pos] = tile_type
             old_tile_type = tile_type
             i += 1
-
+    # print(chunk_data)
     return chunk_data
 
 
 def pattern_generation(xy):
-    return choice(RANDOM_PATTERNS)
+    global OLD_PATTERN
+    x, y = xy
+    if y == 0 and x == 0:
+        OLD_PATTERN = 0
+    chunk_data = []
+    if y >= 1:
+        for y_pos in range(CHUNK_SIZE - 1, -1, -1):
+            for x_pos in range(CHUNK_SIZE):
+                chunk_data.append([[x * CHUNK_SIZE + x_pos, y * CHUNK_SIZE + y_pos], 4])
+        return chunk_data
+    if y != 0:
+        return EMPTY_CHUNK
+    print(OLD_PATTERN)
+    OLD_PATTERN = choice(patternGenOrder[OLD_PATTERN])
+    tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
+    if x == 0 and y == 0:
+        chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN)
+    elif x < 0 and y == 0:
+        chunk_data = get_chunk_of_pattern(tile_xy, LAVA_PATTERN)
+    elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
+        chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
+    else:
+        chunk_data = get_chunk_of_pattern(tile_xy, RANDOM_PATTERNS[OLD_PATTERN - 1])
+    return chunk_data

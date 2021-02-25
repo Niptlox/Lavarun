@@ -48,7 +48,7 @@ class ScrollArea(Frame):
                 if self.offsetXY[1] < 0:# or self.rect.h > self.sizeAllFrames[1]:
                     self.offsetXY[1] = 0
                 ss = self.sizeAllFrames[1] - self.rect.h + self.vspace
-                print("offsetXY", self.offsetXY, ss, self.rect.h, self.sizeAllFrames[1])
+                # print("offsetXY", self.offsetXY, ss, self.rect.h, self.sizeAllFrames[1])
                 if self.rect.h < self.sizeAllFrames[1] and self.offsetXY[1] > ss:
                     self.offsetXY[1] = ss
 

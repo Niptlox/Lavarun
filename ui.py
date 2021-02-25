@@ -27,23 +27,24 @@ class StartMenu(Frame):
 
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
         size_but = (imgB_up.get_width() // 5, imgB_up.get_height() // 5)
+        size_butdiv2 = size_but[0], size_but[1] / 1.2
         step = 60
-        bx, by = self.proc_coords((0.08, 0.29))
+        bx, by = self.proc_coords((0.08, 0.22))
         self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
-        by += step * 2
+        by += step * 3
         self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
-        by += step * 2
+        by += step * 3
         # self.butStart2 = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartHard)
         # by += step
         # xy_labelScore = self.convert_func_coords((300, 120), STATIC_SIZE)
+        color_schema = ((BLACK, BLACK, BLACK), (WHITE, GRAY, GRAY))
+        but_surf_full = createImagesButton(size_but, "FullScreen", color_schema=color_schema)
+        self.butFullS = Button(((bx, by), size_butdiv2), *but_surf_full, func=funcFullScreen)
+        by += step * 4
+        but_surf_quit = createImagesButton(size_but, "Exit", color_schema=color_schema)
+        self.butQuit = Button(((bx, by), size_butdiv2), *but_surf_quit, func=funcQuit)
 
-        but_surf_full = createImagesButton(size_but, "FullScreen")
-        self.butFullS = Button(((bx, by), size_but), *but_surf_full, func=funcFullScreen)
-        by += step * 2
-        but_surf_quit = createImagesButton(size_but, "Exit")
-        self.butQuit = Button(((bx, by), size_but), *but_surf_quit, func=funcQuit)
-
-        xy_labelScore = self.proc_coords((0.38, 0.29))
+        xy_labelScore = self.proc_coords((0.78, 0.12))
         self.labelScore = Label((xy_labelScore, (170, 30)), bg=BLACK)
         self.score_update()
         self.groupBts = pygame.sprite.LayeredUpdates((self.butStart, self.butStart2, self.butFullS, self.butQuit))

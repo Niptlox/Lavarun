@@ -17,8 +17,8 @@ GRAY = pygame.color.Color("gray")
 
 COLORKEY = GREEN
 
-TEXTFONT = pygame.font.SysFont('serif', 18)
-
+TEXTFONT = pygame.font.SysFont('Roboto', 32)
+TEXTFONT_BTN = pygame.font.SysFont('Roboto', 40)
 
 def isColor(arg):
     if type(arg) is pygame.Color or (type(arg) in (tuple, list) and 3 <= len(arg) <= 4):
@@ -99,7 +99,7 @@ def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):
     animation_name = path.split('/')[-1].split('\\')[-1]
     animation_frames = []
     n = 0
-    print("load_animation", path, animation_name)
+    # print("load_animation", path, animation_name)
     for count_frame in frame_durations:
         # animation_frame_id = animation_name + '_' + str(n)
         img_loc = path + '_' + str(n) + '.png'

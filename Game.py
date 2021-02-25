@@ -27,7 +27,7 @@ class Game(Window):
         if self.phasa == P_MENUSTART:
             self.scene = self.startMenu
         elif self.phasa == P_GAMELOOP_EASY:
-            self.frameGame.newGame(-1, diff=World.EASY)
+            self.frameGame.newGame(-2, diff=World.EASY)
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
         elif self.phasa == P_GAMELOOP_HARD:

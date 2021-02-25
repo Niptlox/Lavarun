@@ -122,7 +122,7 @@ class World:
 
     def del_obj(self, xy_tile, i_tile):
         xy_chank = xy_tile[0] // CHUNK_SIZE_DIS, xy_tile[1] // CHUNK_SIZE_DIS
-        print("del_obj", xy_chank, xy_tile, i_tile)
+        # print("del_obj", xy_chank, xy_tile, i_tile)
         self.game_map[xy_chank][i_tile] = None
 
     def replace_obj(self, tile_type, xy_tile, i_tile):
@@ -268,9 +268,9 @@ class GamePause(Frame):
         self.set_pos_center(window_rect)
         self.func_back = func_back
         but_size = self.proc_size((0.6, 0.2))
-        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY)
-        but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY)
-        but_surf_menu = createImageButton(but_size, "Menu"), createImageButton(but_size, "Menu", bg=GRAY)
+        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY, font=TEXTFONT_BTN)
+        but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY, font=TEXTFONT_BTN)
+        but_surf_menu = createImageButton(but_size, "Menu"), createImageButton(but_size, "Menu", bg=GRAY, font=TEXTFONT_BTN)
         buts = createVSteckButtons(but_size, self.rect.w // 2, 20, 20,
                                    [but_surf_back, but_surf_restart, but_surf_menu],
                                    [func_back, func_restart, func_menu])
@@ -280,7 +280,7 @@ class GamePause(Frame):
         if args:
             event = args[0]
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                print("event", event)
+                # print("event", event)
                 pass
                 self.func_back()
             super().update(*args)
