@@ -1,5 +1,6 @@
 import pygame
-import  os
+import os
+from Texture import FPSFONT
 
 
 # os.environ['SDL_VIDEO_CENTERED'] = '0'
@@ -24,6 +25,7 @@ class Window:
         self.inFullScreen = False
         self.initPG()
         self.initGame()
+        self.show_fps = True
 
     def main(self):
         self.mainLoop()
@@ -50,13 +52,20 @@ class Window:
             self.scene = None
 
     def newScene(self):
-        self.scene.start_scene(self)
+        if self.scene:
+            self.scene.start_scene(self)
 
     def initGame(self):
+        self.clock = pygame.time.Clock()
         self.setPhase(None)
 
+    def redraw(self):
+        self.scene.draw(self.screen)
+        if self.show_fps:
+            surface_fps = FPSFONT.render(str(round(self.clock.get_fps(), 2))+ "fps", False, (0, 250, 0))
+            self.screen.blit(surface_fps, (2, 2))
+
     def mainLoop(self):
-        self.clock = pygame.time.Clock()
         running = True
         while running:
             for event in pygame.event.get():
@@ -64,9 +73,8 @@ class Window:
                     self.quit()
                     running = False
                 self.scene.update(event)
-
+            self.redraw()
             # screen.fill((0, 0, 0))
-            self.scene.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(self.fps)
         pygame.quit()

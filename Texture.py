@@ -19,6 +19,9 @@ COLORKEY = GREEN
 
 TEXTFONT = pygame.font.SysFont('Roboto', 32)
 TEXTFONT_BTN = pygame.font.SysFont('Roboto', 40)
+FPSFONT = pygame.font.SysFont('Roboto', 15)
+
+
 
 def isColor(arg):
     if type(arg) is pygame.Color or (type(arg) in (tuple, list) and 3 <= len(arg) <= 4):

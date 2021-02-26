@@ -43,6 +43,7 @@ class Game(Window):
 
     def initGame(self):
         import World
+        super().initGame()
         self.startMenu = StartMenu(lambda: self.setPhase(P_GAMELOOP_EASY),
                                    lambda: self.setPhase(P_GAMELOOP_HARD),
                                    lambda: self.setPhase(P_GAMELOOP_RANDOM),

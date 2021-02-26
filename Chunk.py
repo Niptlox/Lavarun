@@ -13,8 +13,15 @@ DIRT_CHUNK = [[N_DIRTDOWN] * CHUNK_SIZE] * CHUNK_SIZE
 TYPE_TXT = ".pat"
 PATTERNS_PATH = "data\\patterns\\"
 
+def pattern_dirt_convert(pattern):
+    for row in range(CHUNK_SIZE):
+        for column in range(CHUNK_SIZE):
+            if pattern[row][column] == N_DIRTDOWN and (row == 0 or not pattern[row - 1][column]):
+                    pattern[row][column] = N_DIRT
+    return pattern
 
 def load_pattern(name, typep=TYPE_TXT):
+    print("load_pattern", name, typep)
     if typep == TYPE_TXT:
         file_path = PATTERNS_PATH + name + typep
         with open(file_path) as f:
@@ -32,6 +39,7 @@ def load_pattern(name, typep=TYPE_TXT):
                     x += 1
                 out_ar[y] = a_st
                 y += 1
+        out_ar = pattern_dirt_convert(out_ar)
         return out_ar
 
 
@@ -46,7 +54,7 @@ RANDOM_PATTERNS = []
 for i in RANDOM_PATTERN_NAMES:
     RANDOM_PATTERNS.append(load_pattern(i))
 OLD_PATTERN = 0
-patternGenOrder = [[1], [2, 5, 1], [4], [4, 3], [5, 2, 1], [1, 2, 3]]  # Определяет порядок в котором генерируются паттерны
+patternGenOrder = [[1, 4], [2], [3], [4], [5], [1]]  # Определяет порядок в котором генерируются паттерны
 # Первый подмассив, это те паттерны, которые могут появиться после чанка спавна,
 # 2 подмассив, это те паттерны, которые могут появиться после чанка с номером 2 и т.д.
 # Сами паттерны берутся из RANDOM_PATTERN_NAMES(отсчет идет с единицы(0 обозначает чанк спавна))
@@ -126,6 +134,8 @@ def random_chunk(xy):  # генерация случайного чанка
 def pattern_generation(xy):
     global OLD_PATTERN
     x, y = xy
+    if y == 0 and x == 0:
+        OLD_PATTERN = 0
     tile_xy = x * CHUNK_SIZE, y * CHUNK_SIZE
     chunk_data = []
     if y >= 1:
@@ -137,9 +147,8 @@ def pattern_generation(xy):
     if y != 0:
         return EMPTY_CHUNK
     # print(OLD_PATTERN)
-    print(str(xy) + ":" + str(patternGenOrder[OLD_PATTERN]))
+    OLD_PATTERN = choice(patternGenOrder[OLD_PATTERN])
     if x == 0 and y == 0:
-        OLD_PATTERN = 0
         chunk_data = get_chunk_of_pattern(tile_xy, START_PATTERN)
     elif x == -10 and y == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, EASTER_EGG_PATTERN)
@@ -150,6 +159,5 @@ def pattern_generation(xy):
     elif x != 0 and y == 0 and randint(1, 5) == 1 and x % 2 == 0:
         chunk_data = get_chunk_of_pattern(tile_xy, PLAT_PATTERN)
     else:
-        OLD_PATTERN = choice(patternGenOrder[OLD_PATTERN])
         chunk_data = get_chunk_of_pattern(tile_xy, RANDOM_PATTERNS[OLD_PATTERN - 1])
     return chunk_data

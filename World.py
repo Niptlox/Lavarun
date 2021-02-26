@@ -16,7 +16,8 @@ EASY = 1
 class World:
     COF_CAMERA_FRICTION = 0.1  # коэффициент для скольжения камеры
 
-    def __init__(self, display_size=STATIC_SIZE):
+    def __init__(self, display_size=STATIC_SIZE, clock=None):
+        self.clock = clock
         self.game_map = {}
         # при level < 0  авто генерация, иначе из файла
         self.level = -1
@@ -121,6 +122,7 @@ class World:
         self.player.draw(self.display, (self.player.rect.x - scroll[0], self.player.rect.y - scroll[1]))
         self.display.blit(self.player.surface_oxygen_bar, (20, 20))
         self.display.blit(self.player.surface_score, (self.display_size[0] - 120, 20))
+
 
     def del_obj(self, xy_tile, i_tile):
         xy_chank = xy_tile[0] // CHUNK_SIZE_DIS, xy_tile[1] // CHUNK_SIZE_DIS
