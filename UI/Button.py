@@ -67,7 +67,7 @@ class Button(pygame.sprite.Sprite):
         self.imgInB = get_texture(imgInB, colorkey=COLORKEY)
 
         self.mauseInButton = False
-        self.mauseDownButton = False
+        self.mouseDownButton = False
         if size is None:
             self.rect = self.image.get_rect()
             self.rect.x, self.rect.y = xy
@@ -93,18 +93,18 @@ class Button(pygame.sprite.Sprite):
             but = 1
             event = args[0]
             if event.type == pygame.MOUSEBUTTONUP and event.button == but:
-                if self.mauseDownButton:
+                if self.mouseDownButton:
                     self.click()
-                self.mauseDownButton = False
+                self.mouseDownButton = False
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == but:
                 if self.screenRect.collidepoint(event.pos):
                     self.mauseInButton = True
-                    self.mauseDownButton = True
+                    self.mouseDownButton = True
             if event.type == pygame.MOUSEMOTION:
                 if self.mauseInButton:
                     if not self.screenRect.collidepoint(event.pos):
                         self.mauseInButton = False
-                        self.mauseDownButton = False
+                        self.mouseDownButton = False
                 else:
                     if self.screenRect.collidepoint(event.pos):
                         self.mauseInButton = True
@@ -113,7 +113,7 @@ class Button(pygame.sprite.Sprite):
     def click(self):
         if self.func:
             self.mauseInButton = False
-            self.mauseDownButton = False
+            self.mouseDownButton = False
             self.redraw()
             self.func()
         else:
@@ -124,7 +124,7 @@ class Button(pygame.sprite.Sprite):
             self.image = self.imgInB
 
     def redraw(self):
-        if self.mauseDownButton:
+        if self.mouseDownButton:
             self.image = self.imgDownB
         elif self.mauseInButton:
             self.image = self.imgInB

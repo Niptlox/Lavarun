@@ -60,15 +60,15 @@ class World:
         self.player.set_xy((self.display_size[0] // 2, self.display_size[1] // 2))
         self.scroll = [0, 0]
 
-    def set_difficulty(self, diff):
+    def set_difficulty(self, diff):  # установка сложности
         self.difficulty = diff
         player = self.player
         cof = 0.5
         if diff == EASY:
-            player.max_oxygen = 5000 * cof
-            player.oxygen_normal_spending = 1
-            player.oxygen_jump_spending = 20
-            player.score_coff = 1
+            player.max_oxygen = 5000 * cof  # кислород
+            player.oxygen_normal_spending = 1  # трата кислорода в нормальных условиях
+            player.oxygen_jump_spending = 20  # трата кислорода в прыжке
+            player.score_coff = 1  # множитель для очков
         elif diff == NORMAL:
             player.max_oxygen = 3500 * cof
             player.oxygen_normal_spending = 1
@@ -110,7 +110,7 @@ class World:
 
         return True
 
-    def redraw(self):
+    def redraw(self):  # обновление дисплея
         # self.display.fill((146, 144, 255))
         self.display = vertical_gradient(self.display_size, (0, 0, 0, 250), (5, 5, 37, 200))
         # self.display = self.GAME_BACKGROUND.copy()
@@ -129,7 +129,7 @@ class World:
         # print("del_obj", xy_chank, xy_tile, i_tile)
         self.game_map[xy_chank][i_tile] = None
 
-    def replace_obj(self, tile_type, xy_tile, i_tile):
+    def replace_obj(self, tile_type, xy_tile, i_tile):  # замена обьекта
         xy_chank = xy_tile[0] // CHUNK_SIZE_DIS, xy_tile[1] // CHUNK_SIZE_DIS
         tile = self.game_map[xy_chank][i_tile]
         self.game_map[xy_chank][i_tile] = (tile[0], tile_type)
@@ -268,7 +268,7 @@ class GameFrame(Frame):
         self.setPhasa(P_GAMELOOPW)
         self.running = True
 
-    def quit(self):
+    def quit(self):  # выход
         self.world.save_data()
         self.running = False
 
@@ -277,14 +277,14 @@ from UI.Button import *
 from UI.Text import *
 
 
-class GamePause(Frame):
+class GamePause(Frame):  # меню паузы
     def __init__(self, size, window_rect, func_back, func_restart, func_menu):
         bg = get_texture_size(WHITE, size=size)
         super().__init__(pygame.Rect((0, 0), size), bg=bg)
         self.set_pos_center(window_rect)
         self.func_back = func_back
         but_size = self.proc_size((0.6, 0.2))
-        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY, font=TEXTFONT_BTN)
+        but_surf_back = createImageButton(but_size, "Back"), createImageButton(but_size, "Back", bg=GRAY, font=TEXTFONT_BTN)  # кнопки
         but_surf_restart = createImageButton(but_size, "Restart"), createImageButton(but_size, "Restart", bg=GRAY, font=TEXTFONT_BTN)
         but_surf_menu = createImageButton(but_size, "Menu"), createImageButton(but_size, "Menu", bg=GRAY, font=TEXTFONT_BTN)
         buts = createVSteckButtons(but_size, self.rect.w // 2, 20, 20,

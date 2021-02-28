@@ -17,7 +17,7 @@ class Menu(Frame):
                 but = Button(rect)
 
 
-class StartMenu(Frame):
+class StartMenu(Frame):  # начальное меню
     background = get_texture(r"data\sprites\bgStart.png")
 
     def __init__(self, funcStartEasy, funcStartHard, funcStartRandom, funcFullScreen, funcQuit):
@@ -28,7 +28,7 @@ class StartMenu(Frame):
         # xy_but_1 = self.convert_func_coords((100, 120), STATIC_SIZE)
         size_but = (imgB_up.get_width() // 5, imgB_up.get_height() // 5)
         size_butdiv2 = size_but[0], size_but[1] / 1.2
-        step = 60
+        step = 60  # кнопки
         bx, by = self.proc_coords((0.08, 0.22))
         self.butStart = Button(((bx, by), size_but), imgB_up, imgB_in, imgB_down, funcStartEasy)
         by += step * 2

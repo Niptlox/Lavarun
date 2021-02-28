@@ -29,11 +29,7 @@ def isColor(arg):
     return False
 
 
-def vertical_gradient(size, startcolor, endcolor):
-    """
-    Draws a vertical linear gradient filling the entire surface. Returns a
-    surface filled with the gradient (numeric is only 2-3 times faster).
-    """
+def vertical_gradient(size, startcolor, endcolor):  # градиент для заднего фона
     height = size[1]
     bigSurf = pygame.Surface((1, height)).convert_alpha()
     dd = 1.0 / height
@@ -79,7 +75,7 @@ def get_texture_size(texture, size=None, colorkey=None):
     return texture
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None):  # загрузка изображения
     fullname = name  # os.path.join('data', name)
     # если файл не существует, то выходим
     # fullname = r"BetaIMG.png"
@@ -99,7 +95,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):
+def load_animation(path, frame_durations, size=None, colorkey=COLORKEY):  # загрузка анмиации
     animation_name = path.split('/')[-1].split('\\')[-1]
     animation_frames = []
     n = 0

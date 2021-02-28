@@ -25,17 +25,17 @@ class Game(Window):
     def setPhase(self, phasa):
         import World
         super().setPhase(phasa)
-        if self.phasa == P_MENUSTART:
+        if self.phasa == P_MENUSTART:  # начальное меню
             self.scene = self.startMenu
-        elif self.phasa == P_GAMELOOP_EASY:
+        elif self.phasa == P_GAMELOOP_EASY:  # легкий режим
             self.frameGame.newGame(-2, diff=World.EASY)
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
-        elif self.phasa == P_GAMELOOP_HARD:
+        elif self.phasa == P_GAMELOOP_HARD:  # сложный режим
             self.frameGame.newGame(-2, diff=World.HARD)
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
-        elif self.phasa == P_GAMELOOP_RANDOM:
+        elif self.phasa == P_GAMELOOP_RANDOM:  # рандомный режим
             self.frameGame.newGame(-1, diff=World.NORMAL)
             self.frameGame.world.clear_map()
             self.scene = self.frameGame
@@ -48,7 +48,7 @@ class Game(Window):
                                    lambda: self.setPhase(P_GAMELOOP_HARD),
                                    lambda: self.setPhase(P_GAMELOOP_RANDOM),
                                    self.full_screen,
-                                   self.quit)
+                                   self.quit)  # указываем что будут делать кнопки на главном меню
         # world = World.World(display_size=self.size)
         world = World.World()
         self.frameGame = World.GameFrame(((0, 0), self.size), world, to_main_menu=lambda: self.setPhase(P_MENUSTART))

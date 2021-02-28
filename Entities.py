@@ -92,9 +92,9 @@ class Player(Entity):
         self.alive = True
         self.max_oxygen = 5000
         self.oxygen = self.max_oxygen
-        self.oxygen_normal_spending = 1
-        self.oxygen_jump_spending = 20
-        self.oxygen_jump_speed = 8 / STATIC_TILE_SIZE * TILE_SIZE
+        self.oxygen_normal_spending = 1  # трата кислорода
+        self.oxygen_jump_spending = 20  # трата кислорода в прыжке
+        self.oxygen_jump_speed = 8 / STATIC_TILE_SIZE * TILE_SIZE  # скорость прыжка на кислороде
         self.surface_oxygen_bar = pygame.Surface((200, 30))
         self.surface_score = pygame.Surface((90, 20))
         self.score = 0
@@ -181,7 +181,7 @@ class Player(Entity):
         else:
             self.new_tick(**kwargs)
 
-    def new_tick(self, timeTick=None, tile_rects=[], entitys=[]):
+    def new_tick(self, timeTick=None, tile_rects=[], entitys=[]):  # обновление персонажа
         # if self.tap_oxygen_jump and self.vertical_momentum > -self.oxygen_jump_speed:
         #     self.vertical_momentum -= self.oxygen_jump_speed
         #     self.oxygen -= self.oxygen_jump_spending
@@ -211,16 +211,16 @@ class Player(Entity):
         ox, oy = self.rect.x, self.rect.y
         self.rect, collisions = self.move(self.rect, player_movement, tile_rects)
         true_movement = [self.rect.x - ox, self.rect.y - oy]
-        if collisions['bottom'] == True:
+        if collisions['bottom'] == True:  # столкновение с землей
             self.air_timer = 0
             self.vertical_momentum = 0
             self.double_jump = False
             self.fly = False
         else:
             self.air_timer += 1
-        if collisions["top"] == True:
+        if collisions["top"] == True:  # cтолкновение с потолком
             self.vertical_momentum = 0
-        self.oxygen -= self.oxygen_normal_spending
+        self.oxygen -= self.oxygen_normal_spending  # отнимаем кислород
 
         # ENITIES
         hit_list = collision_test_entitys(self.rect, entitys)
@@ -242,7 +242,7 @@ class Player(Entity):
         self.update_image()
         return true_movement
 
-    def take_oxygen_bulloon(self, entity):
+    def take_oxygen_bulloon(self, entity):  # взять кислородный баллон
         self.replace_obj(entity)
         self.oxygen = min(self.oxygen + OXYGEN_COUNT, self.max_oxygen)
 
@@ -262,7 +262,7 @@ class Player(Entity):
     def damage(self, hp_damage=1):
         self.alive = False
 
-    def update_image(self):
+    def update_image(self):  # обновление UI
         if self.air_timer < 6 or self.animation_action == "fly":
             self.num_frame = (self.num_frame + 1) % len(self.animation[self.animation_action])
         else:
@@ -285,11 +285,11 @@ class Player(Entity):
         # print("self.oxygen", self.oxygen)
         # print("num_frame", self.num_frame)
 
-    def move(self, rect, movement, tiles):
+    def move(self, rect, movement, tiles):  # движение
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
         ox, oy = self.rect.x, self.rect.y
         rect.x += movement[0]
-        hit_list = collision_test(rect, tiles)
+        hit_list = collision_test(rect, tiles)  # столкновения
         for tile in hit_list:
             if movement[0] > 0:
                 rect.right = tile.left
@@ -307,7 +307,7 @@ class Player(Entity):
                 rect.top = tile.bottom
                 collision_types['top'] = True
             # print(self.rect.y, self.min_y)
-        if self.rect.y < self.min_y:
+        if self.rect.y < self.min_y:  # cтолкновение с потолком
             self.rect.y = self.min_y
             self.vertical_momentum = -self.vertical_momentum
             collision_types['top'] = True
